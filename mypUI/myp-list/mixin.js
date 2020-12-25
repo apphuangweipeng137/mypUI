@@ -70,7 +70,6 @@ export default {
 		// #ifndef APP-NVUE
 		// 手指开始触摸屏幕
 		mypTouchstartEvent(e) {
-			// if (!this.down.use) return;
 			this.mypStartPoint = getTouchPoint(e)
 			this.mypStartTop = this.mypTheScrollTop || 0
 			this.mypLastPoint = this.mypStartPoint
@@ -132,7 +131,6 @@ export default {
 		},
 		// 手指移开屏幕
 		mypTouchendEvent(e) {
-			// if (!this.down.use) return;
 			// 如果下拉区域高度已改变,则需重置回来
 			if (this.mypIsMoveDown) {
 				if (this.mypDownHeight >= this.mypDown.offset) {
@@ -163,6 +161,9 @@ export default {
 			
 			// 上滑 && 检查并触发上拉
 			isScrollUp && this.mypTriggerUpScroll();
+			if (this.mypCurrentView) {
+				this.mypCurrentView = null
+			}
 		},
 		// 进入下拉区域的那一刻
 		mypDownInOffset() {

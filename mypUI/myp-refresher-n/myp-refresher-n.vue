@@ -1,5 +1,5 @@
 <template>
-	<refresh class="myp-refresher" @refresh="onRefresh" @pullingdown="onPullingDown" :display="refreshing ? 'show' : 'hide'">
+	<refresh class="myp-refresher myp-flex-row myp-justify-center" @refresh="onRefresh" @pullingdown="onPullingDown" :display="refreshing ? 'show' : 'hide'" :style="boxStyle">
 		<view class="myp-cycle-container" ref="cycle">
 			<view class="myp-u-cover myp-u-c1" ref="cover1">
 				<view class="myp-u-cover-cycle myp-u-cover1"></view>
@@ -30,26 +30,51 @@
 
 	export default {
 		props: {
+			/**
+			 * 对应的list/scroll的ref
+			 */
 			scrollerRef: String,
+			/**
+			 * 超时时间。0表示不会超时
+			 */
 			maxTime: {
 				type: Number,
 				default: 0
 			},
+			/**
+			 * 下拉文字提示
+			 */
 			mainText: {
 				type: String,
 				default: '下拉触发刷新...'
 			},
+			/**
+			 * 满足是否刷新时文字提示
+			 */
 			pullingText: {
 				type: String,
 				default: '释放即可刷新...'
 			},
+			/**
+			 * 刷新时文字提示
+			 */
 			refreshingText: {
 				type: String,
 				default: '正在努力加载...'
 			},
+			/**
+			 * 下拉的图标
+			 */
 			downIcon: {
 				type: String,
 				default: '/static/ui/down.png'
+			},
+			/**
+			 * 外层样式
+			 */
+			boxStyle: {
+				type: String,
+				default: ''
 			}
 		},
 		data() {
@@ -224,8 +249,6 @@
 	.myp-refresher {
 		height: 140rpx;
 		width: 750rpx;
-		flex-direction: row;
-		justify-content: center;
 		padding-top: 50rpx;
 	}
 

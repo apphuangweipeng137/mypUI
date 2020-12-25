@@ -1,83 +1,146 @@
 <template>
-	<view class="myp-one" :style="boxStyle">
-		<view v-for="(item, index) in ranges" :key="index" class="myp-one-item" :style="mrItemStyle+(codeArr.length+1 === item?activeItemStyle:'')+(index!==ranges.length-1?('margin-right:'+space+';'):'')">
+	<view class="myp-position-relative myp-flex-row myp-justify-center" :style="boxStyle">
+		<view v-for="(item, index) in ranges" :key="index" class="myp-position-relative" :style="mrItemStyle+(codeArr.length+1 == item?activeItemStyle:'')+(index!=ranges.length-1?('margin-right:'+space+';'):'')">
 			<view v-if="mode === 'middle' && codeIndex <= item" :style="mrMiddleStyle"></view>
-			<view v-if="mode === 'bottom'" :style="mrBottomStyle+(codeArr.length+1 === item?activeLineStyle:'')"></view>
-			<view v-if="mode==='box' && codeArr.length+1 === item" class="myp-one-cursor" :style="mrCursorStyle"></view>
-			<view v-if="secret && codeArr.length >= item" :style="mrDotStyle"></view>
-			<text v-else class="myp-one-item-text" :style="'line-height:'+width+';'+valueStyle">{{ codeArr[index] ? codeArr[index] : ''}}</text>
+			<view v-if="mode === 'bottom'" :style="mrBottomStyle+(codeArr.length+1 == item?activeLineStyle:'')"></view>
+			<view v-if="mode==='box' && codeArr.length+1 == item && cursor" class="myp-one-cursor" :style="mrCursorStyle"></view>
+			<!-- #ifdef APP-NVUE -->
+			<view v-if="password" :class="['myp-position-absolute', codeArr.length >= item?'myp-opacity-1':'myp-opacity-0']" :style="mrDotStyle"></view>
+			<!-- #endif -->
+			<!-- #ifndef APP-NVUE -->
+			<view v-if="password && codeArr.length >= item" class="myp-position-absolute" :style="mrDotStyle"></view>
+			<!-- #endif -->
+			<text v-if="!password" class="myp-text-align-center" :style="'line-height:'+width+';'+valueStyle">{{ codeArr[index] ? codeArr[index] : ''}}</text>
 		</view>
-		<input type="number" :value="inputValue" :focus="focus" :maxlength="maxlength" class="myp-one-hide-input" :style="{height: width}" @input="getVal" />
+		<input :disabled="disabled" type="number" :adjust-position="adjust" :value="inputValue" :focus="focus" :maxlength="maxlength" class="myp-one-hide-input" :style="{height: width}" @input="getVal" @blur="toBlur" @focus="toFocus" @confirm="toConfirm" @keyboardheightchange="toKbChange" />
 	</view>
 </template>
 
 <script>
-	// v-model or refs or nothing(just @finish)
 	export default {
 		props: {
+			/**
+			 * 值
+			 */
 			value: {
 				type: String,
 				default: ''
 			},
-			// 4/5/6
+			/**
+			 * 最大长度。4/5/6
+			 */
 			maxlength: {
 				type: Number,
 				default: 4
 			},
-			secret: {
+			/**
+			 * 是否密码
+			 */
+			password: {
 				type: Boolean,
 				default: false
 			},
+			/**
+			 * 是否带有光标
+			 */
 			cursor: {
 				type: Boolean,
 				default: false
 			},
+			/**
+			 * 是否focus
+			 */
 			focus: {
 				type: Boolean,
 				default: false
 			},
-			// middle-middle line, bottom-bottom line, box-square box
+			/**
+			 * 是否禁用
+			 */
+			disabled: {
+				type: Boolean,
+				default: false
+			},
+			/**
+			 * middle-中间线, bottom-下划线, box-方框
+			 */
 			mode: {
 				type: String,
 				default: "middle"
 			},
-			// height/width相等，且不是scss中定义的系列。直接赋值
+			/**
+			 * adjust-position控制
+			 */
+			adjust: {
+				type: Boolean,
+				default: true
+			},
+			/**
+			 * 自定义height/width
+			 */
 			width: {
 				type: String,
 				default: '100rpx'
 			},
+			/**
+			 * 间隙
+			 */
 			space: {
 				type: String,
 				default: '12rpx'
 			},
+			/**
+			 * password时圆点的样式
+			 */
 			dotStyle: {
 				type: String,
 				default: 'width:16rpx;height:16rpx;border-radius:16rpx;background-color:#000000;'
 			},
+			/**
+			 * middle或bottom时线条的样式
+			 */
 			lineStyle: {
 				type: String,
 				default: 'width:80rpx;height:8rpx;border-radius:12rpx;background-color:#000000;'
 			},
+			/**
+			 * 当前输入框线条的样式
+			 */
 			activeLineStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 光标的样式
+			 */
 			cursorStyle: {
 				type: String,
 				default: 'width:1px;height:42rpx;background-color:#8F9CFF;'
 			},
+			/**
+			 * 值的样式
+			 */
 			valueStyle: {
 				type: String,
 				default: 'font-size:70rpx;font-weight:700;color:#000000;'
 			},
+			/**
+			 * 外层样式
+			 */
 			boxStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 输入框样式
+			 */
 			itemStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前输入框的样式
+			 */
 			activeItemStyle: {
 				type: String,
 				default: ''
@@ -145,7 +208,7 @@
 			},
 			mrDotStyle() {
 				const iw = parseInt(this.width)
-				let _style = `position:absolute;left:${iw*0.5}${this.widthUnit};top:${iw*0.5}${this.widthUnit};`
+				let _style = `left:${iw*0.5}${this.widthUnit};top:${iw*0.5}${this.widthUnit};`
 				_style += `transform:translate(-50%,-50%);`
 				return _style + this.dotStyle
 			}
@@ -161,7 +224,7 @@
 				const arr = val.split('')
 				this.codeIndex = arr.length + 1
 				this.codeArr = arr
-				if (this.codeIndex > Number(this.maxlength)) {
+				if (this.codeIndex > this.maxlength) {
 					this.$emit('finish', this.codeArr.join(''))
 				}
 			},
@@ -177,6 +240,18 @@
 				this.inputValue = ''
 				this.codeArr = []
 				this.codeIndex = 1
+			},
+			toBlur(e) {
+				this.$emit("blur", e)
+			},
+			toFocus(e) {
+				this.$emit("focus", e)
+			},
+			toConfirm(e) {
+				this.$emit("confirm", e.detail.value)
+			},
+			toKbChange(e) {
+				this.$emit("keyboardHeightChange", e)
 			}
 		}
 	}
@@ -184,14 +259,6 @@
 
 <style lang="scss" scoped>
 	.myp-one {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		box-sizing: border-box;
-		/* #endif */
-		flex-direction: row;
-		justify-content: center;
-		position: relative;
-		
 		&-cursor {
 			position: absolute;
 			transform: translate(-50%, -50%);
@@ -220,13 +287,6 @@
 			text-align: left;
 			opacity: 1;
 			background-color: transparent;
-		}
-		&-item {
-			position: relative;
-
-			&-text {
-				text-align: center;
-			}
 		}
 	}
 </style>

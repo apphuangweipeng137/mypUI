@@ -1,5 +1,5 @@
 <template>
-	<view class="myp-refresher">
+	<view class="myp-refresher myp-flex-row myp-justify-center" :style="boxStyle">
 		<view :class="['myp-cycle-container', refreshing&&'myp-scroll-rotate']">
 			<view class="myp-u-cover myp-u-c2" :style="cover2Style">
 				<view class="myp-u-cover-cycle" :style="coverCycleStyle"></view>
@@ -14,33 +14,54 @@
 	
 	export default {
 		props: {
-			maxTime: {
-				type: Number,
-				default: 0
-			},
+			/**
+			 * 下拉时提示文字
+			 */
 			mainText: {
 				type: String,
 				default: '下拉即可刷新...'
 			},
+			/**
+			 * 下拉时提示文字
+			 */
 			pullingText: {
 				type: String,
 				default: '释放即可刷新...'
 			},
+			/**
+			 * 正在刷新的提示文字
+			 */
 			refreshingText: {
 				type: String,
 				default: '正在努力加载...'
 			},
+			/**
+			 * 是否正在刷新
+			 */
 			refreshing: {
 				type: Boolean,
 				default: false
 			},
+			/**
+			 * 是否可以满足刷新
+			 */
 			couldUnLash: {
 				type: Boolean,
 				default: false
 			},
+			/**
+			 * 下拉的进度/比率
+			 */
 			rate: {
 				type: Number,
 				default: 0
+			},
+			/**
+			 * 外层样式
+			 */
+			boxStyle: {
+				type: String,
+				default: ''
 			}
 		},
 		data() {
@@ -72,12 +93,6 @@
 	.myp-refresher {
 		height: 140rpx;
 		width: 750rpx;
-		/* #ifndef APP-NVUE */
-		display: flex;
-		box-sizing: border-box;
-		/* #endif */
-		flex-direction: row;
-		justify-content: center;
 		padding-top: 50rpx;
 	}
 

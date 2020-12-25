@@ -1,25 +1,25 @@
 <template>
-	<view :class="['myp-input', 'myp-bg-'+bgType, 'myp-height-'+height, 'myp-radius-'+radius, 'myp-border-'+border]" :style="boxStyle">
+	<view :class="['myp-flex-row', 'myp-align-center', 'myp-wrap-nowrap', 'myp-bg-'+bgType, 'myp-height-'+height, 'myp-radius-'+radius, 'myp-border-'+border]" :style="boxStyle">
 		<myp-icon v-if="icon&&icon.length>0" :name="icon" :type="iconType" :size="iconSize" :iconStyle="iconStyle" :boxStyle="'margin-right:'+space+';'+iconBoxStyle"></myp-icon>
 		<slot name="label">
 			<text v-if="label&&label.length>0" :class="['myp-color-'+labelType, 'myp-size-'+labelSize]" :style="'margin-right:'+space+';'+labelStyle">{{label||''}}</text>
 		</slot>
 		<!-- #ifndef APP-NVUE -->
-		<view :class="['myp-input-box', 'myp-height-'+height]" :style="inputBoxHeightStyle">
-			<view :class="['myp-input-place', 'myp-input-place-'+valueAlign]">
+		<view :class="['myp-flex-one', 'myp-position-relative', 'myp-height-'+height]" :style="inputBoxHeightStyle">
+			<view :class="['myp-flex-row', 'myp-align-center', 'myp-input-place', 'myp-input-place-'+valueAlign]">
 				<text v-if="showPlaceholder" :class="['myp-size-'+placeSize, 'myp-color-'+placeType]" :style="placeStyle">{{placeholder||''}}</text>
 			</view>
-			<view class="myp-input-input">
-				<input :type="type" :adjust-position="adjust" :confirm-type="confirmType" :maxlength="maxlength" :value="inputValue||''" :password="password" :class="['myp-color-'+valueType, 'myp-size-'+valueSize]" :style="'text-align:'+valueAlign+';'+valueStyle" @input="handleInputedText" @confirm="handleConfirmText" @focus="toFocus" @blur="toBlur" @keyboardheightchange="toChangeKb" />
+			<view class="myp-flex-row myp-align-center myp-input-input">
+				<input :disabled="disabled" :focus="focus" :type="type" :adjust-position="adjust" :confirm-type="confirmType" :maxlength="maxlength" :value="inputValue||''" :password="password" :class="['myp-color-'+valueType, 'myp-size-'+valueSize]" :style="'text-align:'+valueAlign+';'+valueStyle" @input="handleInputedText" @confirm="handleConfirmText" @focus="toFocus" @blur="toBlur" @keyboardheightchange="toChangeKb" />
 			</view>
 		</view>
 		<!-- #endif -->
 		<!-- #ifdef APP-NVUE -->
-		<view class="myp-input-box">
-			<view :class="['myp-input-place', 'myp-input-place-'+valueAlign]">
+		<view class="myp-flex-one myp-position-relative">
+			<view :class="['myp-flex-row', 'myp-align-center', 'myp-input-place', 'myp-input-place-'+valueAlign]">
 				<text v-if="showPlaceholder" :class="['myp-size-'+placeSize, 'myp-color-'+placeType]" :style="placeStyle">{{placeholder||''}}</text>
 			</view>
-			<input :type="type" :adjust-position="adjust" :confirm-type="confirmType" :maxlength="maxlength" :value="inputValue||''" :password="password" :class="['myp-color-'+valueType, 'myp-size-'+valueSize]" :style="'text-align:'+valueAlign+';'+valueStyle" @input="handleInputedText" @confirm="handleConfirmText" @focus="toFocus" @blur="toBlur" @keyboardheightchange="toChangeKb" />
+			<input :disabled="disabled" :focus="focus" :type="type" :adjust-position="adjust" :confirm-type="confirmType" :maxlength="maxlength" :value="inputValue||''" :password="password" :class="['myp-color-'+valueType, 'myp-size-'+valueSize]" :style="'text-align:'+valueAlign+';'+valueStyle" @input="handleInputedText" @confirm="handleConfirmText" @focus="toFocus" @blur="toBlur" @keyboardheightchange="toChangeKb" />
 		</view>
 		<!-- #endif -->
 		<slot name="extra"></slot>
@@ -32,150 +32,268 @@
 	
 	export default {
 		props: {
-			// 格式，每一段的长度:[3, 4, 4]
+			/**
+			 * 自定义格式，每一段的长度:[3, 4, 4]
+			 */
 			format: {
 				type: Array,
 				default: ()=>{return []}
 			},
+			/**
+			 * 自定义格式的分割器
+			 */
 			separator: {
 				type: String,
 				default: " "
 			},
-			// it's input's type
+			/**
+			 * input的type
+			 */
 			type: {
 				type: String,
 				default: "text"
 			},
+			/**
+			 * 最大输入
+			 */
 			maxlength: {
 				type: Number,
 				default: 140
 			},
+			/**
+			 * 是否密码
+			 */
 			password: {
 				type: Boolean,
 				default: false
 			},
+			/**
+			 * 是否聚焦
+			 */
+			focus: {
+				type: Boolean,
+				default: false
+			},
+			/**
+			 * 是否禁用
+			 */
+			disabled: {
+				type: Boolean,
+				default: false
+			},
+			/**
+			 * 左侧图标
+			 */
 			icon: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 左侧label文字
+			 */
 			label: {
 				type: String,
 				default: ""
 			},
+			/**
+			 * 值
+			 */
 			value: {
 				type: String,
 				default: ""
 			},
+			/**
+			 * placeholder
+			 */
 			placeholder: {
 				type: String,
 				default: "请输入内容"
 			},
+			/**
+			 * 右侧图标
+			 */
 			indicator: {
 				type: String,
 				default: ''
 			},
-			// 因为placeholder没有使用input自己的，我们需要利用valueAlign来为placeholder排版
+			/**
+			 * 文字排版
+			 */
 			valueAlign: {
 				type: String,
 				default: 'left'
 			},
+			/**
+			 * 背景主题
+			 */
 			bgType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 高度主题
+			 */
 			height: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 边框主题
+			 */
 			border: {
 				type: String,
 				default: 'bottom'
 			},
+			/**
+			 * 圆角主题
+			 */
 			radius: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 值颜色主题
+			 */
 			valueType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 值尺寸主题
+			 */
 			valueSize: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 图标颜色主题
+			 */
 			iconType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 图标尺寸主题
+			 */
 			iconSize: {
 				type: String,
 				default: 'l'
 			},
+			/**
+			 * label颜色主题
+			 */
 			labelType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * label尺寸主题
+			 */
 			labelSize: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 右侧图标颜色主题
+			 */
 			indicatorType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 右侧图标尺寸主题
+			 */
 			indicatorSize: {
 				type: String,
 				default: 'l'
 			},
+			/**
+			 * placeholder颜色主题
+			 */
 			placeType: {
 				type: String,
 				default: 'place'
 			},
+			/**
+			 * placeholder尺寸主题
+			 */
 			placeSize: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 键盘adjust-position弹出方式
+			 */
 			adjust: {
 				type: Boolean,
 				default: true
 			},
+			/**
+			 * confirm-type
+			 */
 			confirmType: {
 				type: String,
 				default: 'done'
 			},
+			/**
+			 * 图标样式
+			 */
 			iconStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 图标外层样式
+			 */
 			iconBoxStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * label样式
+			 */
 			labelStyle: {
 				type: String,
 				default: ""
 			},
+			/**
+			 * 值样式
+			 */
 			valueStyle: {
 				type: String,
 				default: 'flex:1;'
 			},
+			/**
+			 * 右侧图标样式
+			 */
 			indicatorStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 右侧图标外层样式
+			 */
 			indicatorBoxStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 外层样式
+			 */
 			boxStyle: {
 				type: String,
 				default: ""
 			},
-			// 内部元素之间的空隙
+			/**
+			 * 内部各元素之间的空隙
+			 */
 			space: {
 				type: String,
 				default: '12rpx'
 			},
+			/**
+			 * placeholder的样式
+			 */
 			placeStyle: {
 				type: String,
 				default: ''
@@ -294,30 +412,12 @@
 
 <style lang="scss" scoped>
 	.myp-input {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		box-sizing: border-box;
-		/* #endif */
-		flex-direction: row;
-		flex-wrap: nowrap;
-		align-items: center;
-		
-		&-box {
-			flex: 1;
-			position: relative;
-		}
 		&-place {
 			position: absolute;
 			left: 0;
 			top: 0;
 			right: 0;
 			bottom: 0;
-			/* #ifndef APP-NVUE */
-			display: flex;
-			box-sizing: border-box;
-			/* #endif */
-			flex-direction: row;
-			align-items: center;
 			
 			&-left {
 				justify-content: flex-start;
@@ -335,12 +435,6 @@
 			top: 0;
 			right: 0;
 			bottom: 0;
-			/* #ifndef APP-NVUE */
-			display: flex;
-			box-sizing: border-box;
-			/* #endif */
-			flex-direction: row;
-			align-items: center;
 		}
 	}
 </style>

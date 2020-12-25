@@ -59,6 +59,12 @@
 			}
 		},
 		{
+			"path": "pages/base/input_one",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
 			"path": "pages/base/progress",
 			"style": {
 				"disableScroll": true
@@ -83,7 +89,13 @@
 			}
 		},
 		{
-			"path": "pages/base/slider",
+			"path": "pages/base/sliderbar",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/base/swiper",
 			"style": {
 				"disableScroll": true
 			}
@@ -108,6 +120,12 @@
 		},
 		{
 			"path": "pages/base/tabs",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/base/tabs_v",
 			"style": {
 				"disableScroll": true
 			}
@@ -138,6 +156,12 @@
 		},
 		{
 			"path": "pages/base/content_box",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/base/tab_container",
 			"style": {
 				"disableScroll": true
 			}
@@ -284,6 +308,12 @@
 		},
 		{
 			"path": "pages/drawer/left",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/drawer/scroll_drawer",
 			"style": {
 				"disableScroll": true
 			}
@@ -567,6 +597,18 @@
 				"disableScroll": true
 			}
 		},
+		{
+			"path": "pages/scroll/to_position",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/scroll/video_api",
+			"style": {
+				"disableScroll": true
+			}
+		},
 		// others
 		{
 			"path": "pages/others/index",
@@ -594,9 +636,10 @@
 		// 不使用自带的tabbar，使用自定义的tabbar
 	},
 	"easycom": {
-	  "autoscan": true,
-	  "custom": {
-	    "myp-(.*)": "@/mypUI/myp-$1/myp-$1.vue" // 匹配mypUI内的vue文件
-	  }
+		"autoscan": true,
+		"custom": {
+			"myp-icon": "@/custom/myp-icon/myp-icon.vue", // 允许覆盖某个组件，比如 myp-icon
+			"myp-(.*)": "@/mypUI/myp-$1/myp-$1.vue" // 匹配mypUI内的vue文件
+		}
 	}
 }

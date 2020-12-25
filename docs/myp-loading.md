@@ -2,7 +2,14 @@
 title: 加载中：myp-loading
 type: guide
 order: 253
+page: https://mypui.asnowsoft.cn/h5/#/pages/pop/index
 ---
+
+## Props
+
+| Prop name | Description | Type   | Values | Default |
+| --------- | ----------- | ------ | ------ | ------- |
+| boxStyle  |             | string | -      | ''      |
 
 ## Events
 

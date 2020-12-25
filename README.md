@@ -1,7 +1,5 @@
 # mypUI qq群号：`306797275`
 
-## 从轻出发，重新出发。遇见你，刚刚好。
-
 **第一个高效且强悍的nvue开源组件库。做最好、最顺手的nvue组件库**
 
 - 适用于`nvue`页面的组件与工具（app端对应weex，不再是webview）；
@@ -10,44 +8,32 @@
 - 可配置主题；
 - 细节开放到位，在好用和可灵活适配之间把握到位；
 - request/router/share...各种工具集；
-- 页面内容完全自己控制，移除掉了系统自带的navbar和tabbar，以及外层自动包裹的scroll；
+- 考虑了完全自控的页面设计（移除掉系统自带的navbar和tabbar，以及外层自动包裹的scroll）；
 - 页面排版更加灵活。遮罩层全屏覆盖。status/nav/xBar处理也非常灵活与方便；
 - 精简`page.json`的配置，减少独立配置；
 - 已在`Android`/`iOS`/`mp-wexin`/`mp-qq`/`mp-toutiao`等上面有实际应用；
 
 mypUI 是基于 uniapp 的一套组件库与工具集，可以 **高效且规范** 地开发出 uniapp 支持的各端应用（APP/各家小程序/H5/快应用）。兼容 nvue 页面 和 vue 页面。nvue 页面对应的 app端 依托 weex 编译为原生，具备良好的性能与体验。mypUI 绝对能为您带来 **稳定、高效、规范** 的开发体验。
 
+mypUI 更加注重于通用组件与手势组件，高阶组件、盒子组件的开发，是真正符合 **高质量、灵活、高效、规范等** 开发要求的组件库。
+
 ![demo](https://mypui.asnowsoft.cn/demo-imgs/demo1.png)
 
 ![demo](https://mypui.asnowsoft.cn/demo-imgs/demo2.png)
 
-[Android Demo APK下载](https://mypui.asnowsoft.cn/apk/mypUI_2.0.0.apk)
+[Android Demo APK下载](https://mypui.asnowsoft.cn/apk/mypUI.apk)
 
-![Android下载](https://mypui.asnowsoft.cn/apk/apk_2.0.0.png)
-
-# 2.0全面来袭
-
-## 2.0重点解决什么问题
-
-我们一直在轻量化以及解耦内部的组件以及依赖，2.0我们几乎移除了内部依赖的所有mixin，改为更加独立和轻便的utils function。
-
-同时，2.0版本特别为 APP端 优化，充分利用 APP端 布局的便捷性以及高度决策的便捷性，统一采用自适应高度，为 APP端 移除掉了1.x中引入的高度决策系统。2.0中的list你只需要理解 `flex:1` 就好。
-
-在 非APP-NVUE 端，2.0极大的简化了list高度配置的参数，只需要extra配合height即可，其它高度管理类盒子与mixin也全部换成了简化的配置，降低配置成本。
+![Android下载](https://mypui.asnowsoft.cn/apk/mypUI.png)
 
 # 找到代码与我们
 
 - [mypUI-github](https://github.com/wakaryry/mypUI) 欢迎star
 
-- 1.x分支代码 [mypUI-1.x](https://github.com/wakaryry/mypUI/tree/1.x)
-
 - [mypUI-uniapp插件市场](https://ext.dcloud.net.cn/plugin?id=2190) 需要您的好评
 
 - [mypUI-文档开源地址](https://github.com/wakaryry/mypui-doc)
 
-- [mypUI-文档线上地址](https://mypui.asnowsoft.cn)
-
-- [mypUI-1.x文档线上地址](https://mypui.asnowsoft.cn/v1)
+- [mypUI-文档线上地址](https://mypui.asnowsoft.cn/doc/)
 
 - npm地址：[https://www.npmjs.com/package/@mypui/myp-ui](https://www.npmjs.com/package/@mypui/myp-ui)
 

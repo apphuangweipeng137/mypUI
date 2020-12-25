@@ -2,39 +2,20 @@
 
 ## Props
 
-| Prop name         | Description | Type                   | Values | Default      |
-| ----------------- | ----------- | ---------------------- | ------ | ------------ |
-| icon              |             | string                 | -      | ''           |
-| checkedIcon       |             | string                 | -      | ''           |
-| text              |             | string                 | -      | ''           |
-| value             |             | string\|number\|object | -      |              |
-| isBetween         |             | boolean                | -      | false        |
-| checked           |             | boolean                | -      | false        |
-| disabled          |             | boolean                | -      | false        |
-| textType          |             | string                 | -      | ''           |
-| checkedTextType   |             | string                 | -      | ''           |
-| disabledTextType  |             | string                 | -      | 'disabled'   |
-| iconType          |             | string                 | -      | ''           |
-| checkedIconType   |             | string                 | -      | ''           |
-| disabledIconType  |             | string                 | -      | 'disabled'   |
-| textSize          |             | string                 | -      | ''           |
-| iconSize          |             | string                 | -      | 'l'          |
-| space             |             | string                 | -      | '12rpx'      |
-| direction         |             | string                 | -      | 'left'       |
-| textStyle         |             | string                 | -      | ''           |
-| disabledTextStyle |             | string                 | -      | ''           |
-| checkedTextStyle  |             | string                 | -      | ''           |
-| iconStyle         |             | string                 | -      | ''           |
-| iconMode          |             | string                 | -      | 'aspectFill' |
-| disabledIconStyle |             | string                 | -      | ''           |
-| checkedIconStyle  |             | string                 | -      | ''           |
-| boxStyle          |             | string                 | -      | ''           |
-| iconBoxStyle      |             | string                 | -      | ''           |
+| Prop name | Description       | Type           | Values | Default   |
+| --------- | ----------------- | -------------- | ------ | --------- |
+| value     | 唯一值/返回的内容 | number\|string | -      | ''        |
+| disabled  | 是否禁用          | boolean        | -      | false     |
+| border    | 边框主题          | string         | -      | ''        |
+| radius    | 圆角主题          | string         | -      | ''        |
+| bgType    | 背景主题          | string         | -      | ''        |
+| hover     | hover 效果        | string         | -      | 'opacity' |
+| boxStyle  | 外层样式          | string         | -      | ''        |
 
-## Events
+## Slots
 
-| Event name  | Type      | Description |
-| ----------- | --------- | ----------- |
-| itemClicked | undefined |
+| Name    | Description | Bindings |
+| ------- | ----------- | -------- |
+| default |             |          |
 
 ---

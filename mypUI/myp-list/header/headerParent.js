@@ -9,8 +9,6 @@ export default {
 			mypListId: 'head_swiper_list',
 			// #endif
 			// header
-			mypHeaderHeight: uni.upx2px(168), // 不包含tabs
-			mypTabsHeight: uni.upx2px(80), // 30 + 50
 			mypAllHeight: uni.upx2px(248),
 			// #ifndef APP-NVUE
 			mypChildScrollable: false,
@@ -84,7 +82,6 @@ export default {
 		// #ifndef APP-NVUE
 		// 手指开始触摸屏幕
 		mypTouchstartEvent(e) {
-			// if (!this.down.use) return;
 			this.mypStartPoint = getTouchPoint(e)
 			this.mypStartTop = this.mypTheScrollTop || 0
 			this.mypLastPoint = this.mypStartPoint
@@ -146,7 +143,6 @@ export default {
 		},
 		// 手指移开屏幕
 		mypTouchendEvent(e) {
-			// if (!this.down.use) return;
 			// 如果下拉区域高度已改变,则需重置回来
 			if (this.mypIsMoveDown) {
 				if (this.mypDownHeight >= this.mypDown.offset) {

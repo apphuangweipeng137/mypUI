@@ -1,13 +1,18 @@
 <template>
 	<scroll-view ref="scroll" id="scroll" :scroll-x="true" :scroll-left="scrollLeft" :scroll-with-animation="true" :show-scrollbar="false" :class="['myp-bg-'+bgType, 'myp-border-'+border, 'myp-tabs-scroll']" :style="mrScrollStyle">
-		<view style="flex-direction: column;">
+		<view style="flex-direction: column;position: relative;">
+			<view v-if="hasIndicator&&!hoverTop" ref="myp-underline" :class="[absIndicator&&'myp-tab-item-underline', 'myp-bg-'+indicatorType, isTap?'myp-tab-item-animation':'']" :style="mrIndStyle">
+				<slot name="indicator"></slot>
+			</view>
 			<view :style="mrTabsStyle">
-				<view v-for="(item, index) in items" :key="index" :ref="'item'+index" :id="'item'+index" class="myp-tab-item" :style="mrItemStyle + (index===value ? activeItemStyle:'')" @click="changeTab(index)">
+				<view :style="{width: left}"></view>
+				<view v-for="(item, index) in items" :key="index" :ref="'item'+index" :id="'item'+index" class="myp-tab-item" :style="mrItemStyle + (index===value ? activeItemStyle:'') + (index===items.length-1?'margin-right:0;':'')" @click="changeTab(index)">
 					<text :class="['myp-color-'+(index===value?activeTextType:textType), 'myp-size-'+(index===value?activeTextSize:textSize)]" :style="textStyle + (index===value ? activeTextStyle : '')">{{ textLabel ? item[textLabel] : item }}</text>
 				</view>
+				<view :style="{width: right}"></view>
 			</view>
-			<view v-if="hasIndicator" :class="['myp-tab-item-indicator']" :style="{height: indicatorHeight}">
-				<view ref="myp-underline" :class="['myp-tab-item-underline', 'myp-bg-'+indicatorType, isTap?'myp-tab-item-animation':'']" :style="mrIndStyle"></view>
+			<view v-if="hasIndicator&&hoverTop" ref="myp-underline" :class="[absIndicator&&'myp-tab-item-underline', 'myp-bg-'+indicatorType, isTap?'myp-tab-item-animation':'']" :style="mrIndStyle">
+				<slot name="indicator"></slot>
 			</view>
 		</view>
 	</scroll-view>
@@ -25,135 +30,276 @@
 	
 	export default {
 		props: {
+			/**
+			 * tabs内容
+			 */
 			items: {
 				type: Array,
 				default: function() {
 					return []
 				}
 			},
-			// current index
+			/**
+			 * 当前index
+			 */
 			value: {
 				type: Number,
 				default: 0
 			},
-			// 因为scroll的过程中，current就会发生变化，我们需要用另外一个来记录
+			/**
+			 * 联动时需要。因为scroll的过程中，current就会发生变化，
+			 * 我们需要用另外一个来记录
+			 */
 			last: {
 				type: Number,
 				default: 0
 			},
+			/**
+			 * 文字内容的字段
+			 */
 			textLabel: {
 				type: String,
 				default: null
 			},
-			// px. swiperScroll dx
+			/**
+			 * 联动时swiper的偏移量。px. swiperScroll dx
+			 */
 			offset: {
 				type: Number,
 				default: 0
 			},
+			/**
+			 * swiper的宽度。联动时需要
+			 */
 			swiperWidth: {
 				type: String,
 				default: '750rpx'
 			},
+			/**
+			 * 是否是点击tab。不联动时一直设置为true
+			 */
 			isTap: {
 				type: Boolean,
 				default: false
 			},
-			// center或者end的时候，请注意items的数量不要超过总尺寸
+			/**
+			 * center或者end的时候，请注意items的数量不要超过总尺寸
+			 */
 			justify: {
 				type: String,
 				default: 'flex-start'
 			},
-			// width of the scroll-view
+			/**
+			 * scroll的自定义宽度
+			 */
 			scrollSize: {
 				type: String,
 				default: '750rpx'
 			},
+			/**
+			 * 文字的尺寸主题
+			 */
 			textSize: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前项文字的尺寸主题
+			 */
 			activeTextSize: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 背景主题
+			 */
 			bgType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 文字颜色主题
+			 */
 			textType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前项的文字颜色主题
+			 */
 			activeTextType: {
 				type: String,
 				default: ''
 			},
-			// item height: rpx/px
+			/**
+			 * 自定义高度
+			 */
 			height: {
 				type: String,
 				default: '80rpx'
 			},
-			// 0的时候，自适应宽度
+			/**
+			 * tab项的宽度。0的时候，自适应宽度
+			 */
 			width: {
 				type: String,
 				default: '120rpx'
 			},
+			/**
+			 * 左侧空白占位
+			 */
+			left: {
+				type: String,
+				default: '0'
+			},
+			/**
+			 * 右侧空白占位
+			 */
+			right: {
+				type: String,
+				default: '0'
+			},
+			/**
+			 * 各个tab之间的间隙
+			 */
 			space: {
 				type: String,
 				default: '0px'
 			},
+			/**
+			 * 边框主题
+			 */
 			border: {
 				type: String,
 				default: 'none'
 			},
+			/**
+			 * 是否有底下指示器
+			 */
 			hasIndicator: {
 				type: Boolean,
 				default: true
 			},
+			/**
+			 * 指示器的背景主题
+			 */
 			indicatorType: {
 				type: String,
 				default: 'primary'
 			},
-			// 0的时候动态宽度，自适应宽度
+			/**
+			 * 指示器的自定义宽度。0的时候动态宽度，自适应宽度
+			 */
 			indicatorWidth: {
 				type: String,
 				default: '80rpx'
 			},
+			/**
+			 * 指示器的自定义高度
+			 */
 			indicatorHeight: {
 				type: String,
 				default: '4rpx'
 			},
+			/**
+			 * 指示器的自定义圆角
+			 */
 			indicatorRadius: {
 				type: String,
 				default: '4rpx'
 			},
+			/**
+			 * indicator是否绝对定位
+			 */
+			absIndicator: {
+				type: Boolean,
+				default: true
+			},
+			/**
+			 * 外层样式，也是scroll的样式
+			 */
 			boxStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * tabs的内容样式
+			 */
 			tabsStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 文字样式
+			 */
 			textStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前项的文字样式
+			 */
 			activeTextStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * tab项的样式
+			 */
 			itemStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前项的tab样式
+			 */
 			activeItemStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 指示器的样式
+			 */
 			indicatorStyle: {
 				type: String,
 				default: ''
+			},
+			/**
+			 * 通过改变该值触发位置的重新计算。
+			 * 主要是为了兼容各大平台位置获取的时机问题。
+			 * 在弹层里面，items能够很快拿到，
+			 * 但是不一定位置信息就可以立马拿到
+			 */
+			updateTime: {
+				type: Number,
+				default: 0
+			},
+			/**
+			 * 延迟获取元素内容，
+			 * 只影响mounted里面的调用，
+			 * -1表示不延迟。
+			 * 其他情况使用updateTime
+			 */
+			delay: {
+				type: Number,
+				default: -1
+			},
+			/**
+			 * 延迟获取元素内容，
+			 * 只影响items改变时的调用，
+			 * -1表示不延迟。
+			 * 其他情况使用updateTime
+			 */
+			updateDelay: {
+				type: Number,
+				default: -1
+			},
+			/**
+			 * indicator是否在最上层
+			 */
+			hoverTop: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -169,6 +315,7 @@
 		computed: {
 			mrIndStyle() {
 				let _style = `border-radius:${this.indicatorRadius};`
+				_style += `height:${this.indicatorHeight};`
 				// #ifndef APP-NVUE
 				_style += `width:${this.dyIndicatorWidth}px;`
 				_style += `left:${this.dyIndicatorLeft}px;`
@@ -234,9 +381,9 @@
 				let _style = `height:${this.heightPx}px;`
 				const w = parseInt(this.width)
 				if (w > 0) {
-					_style += `width:${this.widthPx}px;margin-right:${this.spacePx}px;margin-left:${this.spacePx}px;`
+					_style += `width:${this.widthPx}px;margin-right:${this.spacePx}px;`
 				} else {
-					_style += `margin-right:${this.spacePx}px;margin-left:${this.spacePx}px;`
+					_style += `margin-right:${this.spacePx}px;`
 				}
 				_style += "justify-content:center;align-items:center;"
 				// #ifndef APP-NVUE
@@ -249,30 +396,52 @@
 			}
 		},
 		mounted() {
-			setTimeout(()=>{
-				this.toCurrentIndex(this.value, true)
-				// 这样的话要求mounted之后，所有item的宽度不会变化
-				// 所以适用于固定宽度的，或者动态宽度，但是元素生成之后宽度不变的
+			if (this.delay >= 0) {
+				const that = this
+				setTimeout(()=>{
+					that.toCacheItemsSize()
+					that.toCurrentIndex(that.value, true)
+				}, this.delay)
+			} else {
 				this.toCacheItemsSize()
-			}, 60)
+				this.toCurrentIndex(this.value, true)
+			}
 		},
 		watch: {
 			value(newV) {
-				// this.toCurrentIndex(newV)
+				// #ifdef APP-NVUE
+				this.toCurrentIndex(newV)
+				// #endif
+				// #ifndef APP-NVUE
+				// 否则在点击过程中可能响应不正确
 				setTimeout(()=>{
 					this.toCurrentIndex(newV)
 				}, 0)
+				// #endif
 			},
 			items() {
 				// 清缓存
 				this.dyItems = {}
-				setTimeout(()=>{
-					this.toCurrentIndex(this.value)
-					this.toCacheItemsSize()
-				}, 60)
+				const that = this
+				this.$nextTick(()=>{
+					if (that.updateDelay >= 0) {
+						setTimeout(()=>{
+							that.toCacheItemsSize()
+							that.toCurrentIndex(this.value, true)
+						}, that.updateDelay)
+					} else {
+						that.toCacheItemsSize()
+						that.toCurrentIndex(this.value, true)
+					}
+				})
 			},
 			offset(newV) {
 				this.toHandleSwiperScroll(newV)
+			},
+			updateTime() {
+				this.dyItems = {}
+				this.toCacheItemsSize()
+				this.toCurrentIndex(this.value, true)
 			}
 		},
 		methods: {
@@ -406,20 +575,13 @@
 			async toCacheItemsSize() {
 				let scrollL = 0
 				try{
-					const cachedS = this.dyItems['scroll']
-					if (cachedS) {
-						scrollL = cachedS.left
-					} else {
-						const res = await this.getElSize(-100)
-						scrollL = res.left
-						this.dyItems['scroll'] = {left: scrollL}
-					}
+					const res = await this.getElSize(-100)
+					scrollL = res.left
+					this.dyItems['scroll'] = {left: scrollL}
 				}catch(e){
 					//TODO handle the exception
 				}
 				for (const i in this.items) {
-					const cached = this.dyItems['item'+i]
-					if (cached) continue;
 					try{
 						const result = await this.getElSize(i)
 						let indWidth = result.width
@@ -484,25 +646,11 @@
 	    -webkit-appearance: none;
 	    background: transparent;
 	}
-	::-webkit-scrollbar {
-	    display: none;
-	    width: 0 !important;
-	    height: 0 !important;
-		color: transparent;
-	    -webkit-appearance: none;
-	    background: transparent;
-	}
 	/* #endif */
 	
 	.myp-tab-item {
-		
-		&-indicator {
-			position: relative;
-			background-color: transparent;
-		}
 		&-underline {
 			position: absolute;
-			top: 0;
 			bottom: 0;
 			left: 0;
 			width: 0;

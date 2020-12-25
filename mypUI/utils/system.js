@@ -22,6 +22,19 @@ function _getSystemInfo() {
 	if (app.globalData.safeTop > 0 && app.globalData.statusBarHeight === 0) {
 		app.globalData.statusBarHeight = app.globalData.safeTop
 	}
+	// 修正:存在uni的tabbar的时候安全区bottom高度不正确的问题
+	const tabHeight = app.globalData.tabHeight || 50
+	if (app.globalData.safeBottom === 0 || app.globalData.safeBottom - tabHeight > 0) {
+		const extra = info.screenHeight - info.windowHeight
+		if (extra > 0) {
+			// tabHeight 必须大于 safeBottom 才正确
+			if (extra - tabHeight > 0) {
+				app.globalData.safeBottom = extra - tabHeight
+			} else {
+				app.globalData.safeBottom = extra
+			}
+		}
+	}
 
 	app.globalData.platform = info.platform
 	app.globalData.brand = info.brand
@@ -125,6 +138,9 @@ export function getPx(val) {
 }
 
 export function getHeight(val) {
+	if (val === 'screen') {
+		return getScreenHeight()
+	}
 	if (val === 'status') {
 		return getStatusBarHeight()
 	}
@@ -137,19 +153,29 @@ export function getHeight(val) {
 	if (val === 'x') {
 		return getXBarHeight()
 	}
-	if (typeof val === 'string' && (val.startsWith('status') || val.startsWith('nav') || val.startsWith('x'))) {
+	if (typeof val === 'string') {
 		const arr = val.split('-')
 		let h = 0
 		for (const i in arr) {
 			const t = arr[i]
-			if (t === 'status') {
-				h += getStatusBarHeight()
-			} else if (t === 'nav') {
-				h += getNavbarHeight()
-			} else if (t === 'x') {
-				h += getXBarHeight()
+			let factor = 1
+			if (t.startsWith('!')) {
+				factor = -1
+			}
+			if (t === 'screen' || t === '!screen') {
+				h += factor * getScreenHeight()
+			} else if (t === 'status' || t === '!status') {
+				h += factor * getStatusBarHeight()
+			} else if (t === 'nav' || t === '!nav') {
+				h += factor * getNavbarHeight()
+			} else if (t === 'x' || t === '!x') {
+				h += factor * getXBarHeight()
 			} else {
-				h += getPx(t)
+				if (t.startsWith('!')) {
+					h -= getPx(t.substring(1))
+				} else {
+					h += getPx(t)
+				}
 			}
 		}
 		return h

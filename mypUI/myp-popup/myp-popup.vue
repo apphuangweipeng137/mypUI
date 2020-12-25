@@ -1,9 +1,9 @@
 <template>
 	<view>
 		<view>
-			<myp-overlay :show="overlayShow" :bgType="overlay.bgType" :bg="overlay.bg" :duration="overlay.duration" :hasAnimation="overlay.hasAnimation" :timingFunction="overlay.timingFunction" :canAutoClose="false" :left="left" :top="top" :right="right" :bottom="bottom" @overlayClicked="overlayClicked"></myp-overlay>
+			<myp-overlay :show="hasOverlay&&overlayShow" :bgType="overlay.bgType" :bg="overlay.bg" :duration="overlay.duration" :hasAnimation="overlay.hasAnimation" :timingFunction="overlay.timingFunction" :canAutoClose="false" :left="left" :top="top" :right="right" :bottom="bottom" :boxStyle="overlayStyle" @overlayClicked="overlayClicked"></myp-overlay>
 		</view>
-		<view ref="myp-popup" v-if="helpShow" @click.stop="toPrevent" :class="['myp-popup', 'myp-bg-'+bgType]" :style="boxStyle+mrPopStyle + noWeexAni">
+		<view ref="myp-popup" v-if="helpShow" @click.stop="toPrevent" :class="['myp-popup', 'myp-flex-column', 'myp-bg-'+bgType]" :style="boxStyle+mrPopStyle + noWeexAni">
 			<slot></slot>
 		</view>
 	</view>
@@ -18,22 +18,44 @@
 	// TODO: add height animation: height-0->height
 	export default {
 		props: {
+			/**
+			 * 是否显示/打开
+			 */
 			show: {
 				type: Boolean,
 				default: false
 			},
+			/**
+			 * 定位位置
+			 */
 			pos: {
 				type: String,
 				default: 'bottom'
 			},
+			/**
+			 * 背景主题
+			 */
 			bgType: {
 				type: String,
 				default: 'none'
 			},
+			/**
+			 * 动画周期
+			 */
 			duration: {
 				type: Number,
 				default: 300
 			},
+			/**
+			 * 是否有overlay
+			 */
+			hasOverlay: {
+				type: Boolean,
+				default: true
+			},
+			/**
+			 * 遮罩层设置
+			 */
 			overlay: {
 				type: Object,
 				default: () => ({
@@ -44,57 +66,111 @@
 					bgType: 'mask'
 				})
 			},
+			/**
+			 * 自定义高度
+			 */
 			height: {
 				type: String,
 				default: '0'
 			},
+			/**
+			 * 需要从屏幕高度额外减去的高度
+			 */
 			extra: {
 				type: String,
 				default: '0'
 			},
+			/**
+			 * 内容与屏幕左侧的偏移量
+			 */
 			leftOffset: {
 				type: String,
 				default: '-1'
 			},
+			/**
+			 * 内容与屏幕右侧的偏移量
+			 */
 			rightOffset: {
 				type: String,
 				default: '-1'
 			},
+			/**
+			 * 内容与屏幕底部的偏移量
+			 */
 			bottomOffset: {
 				type: String,
 				default: '-1'
 			},
+			/**
+			 * 内容与屏幕顶部的偏移量
+			 */
 			topOffset: {
 				type: String,
 				default: '-1'
 			},
+			/**
+			 * 自定义宽度
+			 */
 			width: {
 				type: String,
 				default: '750rpx'
 			},
+			/**
+			 * 动画函数
+			 */
 			animation: {
 				type: Object,
 				default: () => ({
-					timingFunction: 'ease-in-out'
+					timingFunction: 'ease-out'
 				})
 			},
+			/**
+			 * 遮罩与屏幕左侧的偏移量
+			 */
 			left: {
 				type: String,
 				default: '0'
 			},
+			/**
+			 * 遮罩与屏幕顶部的偏移量
+			 */
 			top: {
 				type: String,
 				default: '0'
 			},
+			/**
+			 * 遮罩与屏幕右侧的偏移量
+			 */
 			right: {
 				type: String,
 				default: '0'
 			},
+			/**
+			 * 遮罩与屏幕底部的偏移量
+			 */
 			bottom: {
 				type: String,
 				default: '0'
 			},
+			/**
+			 * 确保存在动画
+			 * 需要加延时
+			 */
+			delay: {
+				type: Number,
+				default: 10
+			},
+			/**
+			 * 内容外层样式
+			 */
 			boxStyle: {
+				type: String,
+				default: ''
+			},
+			/**
+			 * overlay的外层样式
+			 */
+			overlayStyle: {
 				type: String,
 				default: ''
 			}
@@ -241,18 +317,22 @@
 		methods: {
 			toHackShow(bool) {
 				if (bool) {
+					const that = this
 					// 先渲染元素
 					this.overlayShow = true
+					// TODO:
+					// 调整一下逻辑，利用 nextTick 之类的
 					// 必须确保overlay先于popup-content渲染，将popup-content移入下一个loop
-					setTimeout(()=>{
-						this.helpShow = true
-					}, 0)
 					// app端不能同一个loop同步执行，否则overlay始终在最上层
-					// this.helpShow = true
 					// 为了能够获取到元素，且实现动画
-					setTimeout(() => {
-						this.appearPopup(bool);
-					}, 50);
+					this.$nextTick(function(){
+						that.helpShow = true
+						that.$nextTick(function(){
+							setTimeout(()=>{
+								that.appearPopup(bool)
+							}, that.delay)
+						})
+					})
 				} else {
 					// 关闭动画需要执行动画之后再关闭v-if
 					this.overlayShow = false
@@ -408,10 +488,5 @@
 	.myp-popup {
 		position: fixed;
 		width: 750rpx;
-		flex-direction: column;
-		/* #ifndef APP-NVUE */
-		display: flex;
-		box-sizing: border-box;
-		/* #endif */
 	}
 </style>

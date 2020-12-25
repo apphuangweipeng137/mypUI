@@ -2,23 +2,37 @@
 title: 列表：myp-list
 type: guide
 order: 60
+page: https://mypui.asnowsoft.cn/h5/#/pages/scroll/index
 ---
 
 ## Props
 
-| Prop name      | Description | Type    | Values | Default                                                                              |
-| -------------- | ----------- | ------- | ------ | ------------------------------------------------------------------------------------ |
-| showScrollbar  |             | boolean | -      | true                                                                                 |
-| bgType         |             | string  | -      | 'page'                                                                               |
-| position       |             | string  | -      | 'static'                                                                             |
-| top            |             | string  | -      | '0'                                                                                  |
-| bottom         |             | string  | -      | '0'                                                                                  |
-| boxStyle       |             | string  | -      | ''                                                                                   |
-| useLoading     |             | boolean | -      | false                                                                                |
-| loadMoreOffset |             | number  | -      | 60                                                                                   |
-| autoUpdate     |             | boolean | -      | false                                                                                |
-| down           |             | object  | -      | {<br> use: true,<br> offset: uni.upx2px(140),<br> inRate: 0.8,<br> outRate: 0.2<br>} |
-| up             |             | object  | -      | {<br> use: true,<br> offset: 80<br>}                                                 |
+| Prop name       | Description                                       | Type    | Values | Default                                                                              |
+| --------------- | ------------------------------------------------- | ------- | ------ | ------------------------------------------------------------------------------------ |
+| showScrollbar   | 是否显示 scrollbar                                | boolean | -      | true                                                                                 |
+| bgType          | 背景主题                                          | string  | -      | 'page'                                                                               |
+| position        | 定位                                              | string  | -      | 'static'                                                                             |
+| top             | 定位的 top                                        | string  | -      | '0'                                                                                  |
+| bottom          | 定位的 bottom                                     | string  | -      | '0'                                                                                  |
+| boxStyle        | 外层样式                                          | string  | -      | ''                                                                                   |
+| extra           | 需要从屏幕高度减去的高度                          | string  | -      | 'status-nav'                                                                         |
+| height          | 设置了 height，会直接使用 height，忽略其它的计算  | string  | -      | '0'                                                                                  |
+| reverse         | 是否颠倒列表                                      | boolean | -      | false                                                                                |
+| loadMainText    | 可以继续加载时的文字提示                          | string  | -      | '继续加载更多'                                                                       |
+| loadingText     | 正在加载时的文字提示                              | string  | -      | '正在加载'                                                                           |
+| noMoreText      | 没有更多时的文字提示                              | string  | -      | '没有更多啦'                                                                         |
+| showNoMore      | 是否展示没有更多                                  | boolean | -      | true                                                                                 |
+| loadingSrc      | 加载中的 gif 图片                                 | string  | -      | '/static/ui/loading-small.gif'                                                       |
+| loadingStyle    | loading 的外层样式                                | string  | -      | ''                                                                                   |
+| refreshMainText | 下拉时提示文字                                    | string  | -      | '下拉即可刷新...'                                                                    |
+| pullingText     | 下拉时提示文字                                    | string  | -      | '释放即可刷新...'                                                                    |
+| refreshingText  | 正在刷新的提示文字                                | string  | -      | '正在努力加载...'                                                                    |
+| refreshStyle    | 刷新组件的外层样式                                | string  | -      | ''                                                                                   |
+| useLoading      | 是否启用 loading 组件，而不是 loadmoreoffset 触发 | boolean | -      | false                                                                                |
+| loadMoreOffset  | 使用 loadmoreoffset 时的触发偏移量                | number  | -      | 60                                                                                   |
+| autoUpdate      | 是否自动加载第一页数据                            | boolean | -      | false                                                                                |
+| down            | 下拉刷新的配置                                    | object  | -      | {<br> use: true,<br> offset: uni.upx2px(140),<br> inRate: 0.8,<br> outRate: 0.2<br>} |
+| up              | 上提加载的配置                                    | object  | -      | {<br> use: true,<br> offset: 80<br>}                                                 |
 
 ## Events
 
@@ -45,15 +59,13 @@ order: 60
 
 > 主要功能如下：
 
-- 高度控制；
+- app端高度继承，MP/H5端高度控制；
 - 可开可关闭的 下拉刷新 与 上提加载；
 - 可以设置 是使用 loader 组件来实现 上提加载，还是使用 loadMore 事件来实现上提加载；
-- 自动兼容 安全区 xBar；
+- 可以用来做聊天列表，并提供了示范；
 - ...
 
-如果您只是纯粹的想使用一个不带刷新和加载的列表，请使用 `myp-list-simple`，其文档见 [myp-list-simple](/doc/guide/myp-list-simple.html)
-
-## 快速使用
+**快速使用**
 
 ```html
 <template>
@@ -77,6 +89,7 @@ order: 60
 	  toLoadData() {
 		const ins = this.$refs['myp-list']
 		const cp = ins.mypCurrentPage
+		// 您需要更换这个api接口
 		requestApi({page: cp}).then(response => {
 		  if (cp === 1) {
 			this.items = response.results || []
@@ -94,7 +107,7 @@ order: 60
 </script>
 ```
 
-以上代码就会实现一个 自动铺满屏幕（不包含status和navbar）的list组件，而且不需要您额外考虑 xbar 以及遮挡问题，他会自动处理，保证list的元素全部可见。
+以上代码就会实现一个 自动铺满屏幕（不包含status和navbar）的list组件。
 
 `myp-list` 默认插槽 的子组件必须是 `myp-list-cell`。（因为weex端，list下只能是cell组件）
 
@@ -102,39 +115,11 @@ order: 60
 
 在 `loadData` 方法中，我们不需要自己去管理当前的页面等状态，`myp-list` 会自己管理，你只需要调用 成功或者失败 的回掉即可。
 
-## 高度控制
-
-`myp-list` 默认是 占满剩余屏幕（也就是不包含 status和navbar，占满其它剩余空间）。您可以设置 `includeStatus` `includeNav` `tabHeight` `extra` `height` 来决定她的最终高度。
-
-### includeStatus
-
-是否包含status，也就是是否包含顶部的状态栏。默认是 `false`，不包含。一般与 `includeNav` 搭配使用。
-
-### includeNav
-
-是否包含 navbar，也就是是否包含导航栏。默认是 `false`，不包含。该导航栏的高度默认是 `44px`，您可以根据需要在 `myp-mixin/windowMixin.js` 中查看以及设置 导航栏的高度。
-
-### includeXBar
-
-是否包含xBar。默认是包含 xBar 的。包含 xBar 的时候会自动考虑 xBar 的遮挡问题。默认是 xbar 处也会显示内容，list滚动到底部的时候内容不会被 xBar 遮挡住。如果您需要控制 xBar 与 list内容 存在的方式，`overrideXBar` 可以满足您的需求。 `includeXBar:true` 时，`overrideXBar:true` 会表示 内容高度包含 xBar，`overrideXBar:false` 表示内容高度不包含 xBar， xBar 具备独立的占位。但不管 `overrideXBar` 怎么设置，我们都为您自动考虑了最终内容与xbar的遮挡问题。
-
-### tabHeight
-
-tabbar 的高度，默认是 `0` ，也就是 当前页面没有 tabbar，`Number` 类型，对应的单位是 `px` （我们不建议使用 rpx 作为 tabbar 的高度）。uniapp 的 tabbar 高度默认是 `50px`。
-
-### extra
-
-需要排除掉的额外高度，作为辅助与补充。比如list上面有一个高度为 `80rpx` 的 tabs 组件。这个时候我们需要额外减去这个高度，我们就设置 `extra="80rpx"`。可以是 `String`，可以是 `Number`，可以带 `rpx` 或者 `px` 单位，不带单位默认为 `rpx`。允许拼接写法：`80-40px-100rpx` （表示 80rpx + 40px + 100rpx）。
-
-### height
-
-height默认是 0。也就是 list 的高度通过计算而来，不是 height 直接控制。如果设置了大于 0 的高度，会直接使用 height的高度，不再考虑别的高度决定元素。height 可以是 `String`，可以是 `Number`，可以带 `rpx` 或者 `px` 单位，不带单位默认为 `rpx`。不支持拼接写法。
-
-## 刷新与加载
+**刷新与加载**
 
 我们提供了刷新与加载的开关，以及事件。大致为：`autoUpdate` `down` `up` `@inited` `@down` `@up` 。
 
-### down
+**down**
 
 下拉刷新的开关。默认是打开的，也就是：`{use: true, offset: uni.upx2px(140), inRate: 0.8, outRate: 0.2}`。
 
@@ -143,9 +128,11 @@ height默认是 0。也就是 list 的高度通过计算而来，不是 height �
 - `inRate`: 满足释放刷新之前的拉下难易程度。
 - `outRate`: 满足释放刷新之后的拉下难易程度。
 
+关闭刷新可以是 `:down="{use:false}"` ，也可以是 `:down="null"`。
+
 刷新开启之后，会有对应的 `@down` 事件。
 
-### up
+**up**
 
 上提加载的开关。默认是打开的。也就是：`{use: true, offset: 80}`。
 
@@ -157,15 +144,15 @@ height默认是 0。也就是 list 的高度通过计算而来，不是 height �
 
 如果您需要使用 `weex` 中的 `loading` 组件来做 上提加载更多，您需要设置：`useLoading:true`。我们默认是关闭了 `useLoading`，而是使用 `loadMoreOffset` 这个属性来配置可触发加载更多时的底部距离。
 
+关闭上提加载可以是 `:up="{use:false}"` ，也可以是 `:up="null"`。
+
 不管使用啥，上提加载对应的事件是 `@up`。
 
-### autoUpdate
+**autoUpdate**
 
 是否自动加载第一页数据。默认不加载，也就是 `autoUpdate:false`。
 
-`autoUpdate:true` 即可自动加载第一页数据，当然前提条件是 开启了 下拉刷新。
-
-**TODO: 不开启下拉刷新的时候，如果开启了上提加载，`autoUpdate:true` 也可以自动加载第一页。当前，您完全可以在 `@inited` 事件里面手动实现，也就是调用 `ins.mypLoad()` 方法**
+`autoUpdate:true` 即可自动加载第一页数据，当然前提条件是 开启了 下拉刷新或者上提加载。
 
 > 如果您不开启 `autoUpdate` 如何加载第一页数据了？
 
@@ -173,11 +160,11 @@ height默认是 0。也就是 list 的高度通过计算而来，不是 height �
 
 **注意**：这里的 ins 指的是 myp-list 的ref。比如 `<myp-list ref="myp-list"></myp-list>`, ins 就是 `this.$refs['myp-list']` whatever
 
-### @dwon
+**@dwon**
 
 开启了下拉刷新，就必须提供 `@dwon` 事件，并且在里面处理您的刷新逻辑。一般情况下， `@down` 与 `@up` 公用一个处理逻辑。
 
-### @up
+**@up**
 
 开启了 上提加载，就必须提供 `@up` 事件。一般与 `@down` 回调是同一个函数。
 
@@ -202,7 +189,7 @@ toLoadData() {
 
 也就是上面写的，`ins.mypEndSuccess(ifHasNextPage)` 以及 `ins.mypEndError()`。刷新或者加载成功/失败都需要调用相应的接口，以便 `myp-list` 能够正确的为您处理业务。
 
-### @inited
+**@inited**
 
 有时候，您需要一个时机，这个时机是 myp-list 已经准备好了的时候。我们为您提供了 `@inited` 事件监听。这说明 myp-list 已经准备好了一切，您可以尽情的调用。有时候页面内容的初始化刷新，您可以在此事件的回调中处理。
 
@@ -210,89 +197,6 @@ toLoadData() {
 
 `autoUpdate` 也是一样。
 
-## xBar的处理
-
-默认情况下，我们是包含 xBar的，而且 list的内容会出现在 xBar 的位置，滑动到最底部的时候 xBar 不会遮挡住内容。也就是 `includeXBar:true` 和 `overrideXBar:true`。
-
-`overrideXBar:false` 时，xBar 会有独立的占位，list内容的高度不会包含 xBar。
-
-您还可以为 xBar 设置 背景主题，以及设置 个性化的style，他们分别对应：`xBarBgType` `xBarBgStyle`。
-
-具体您可以看 `/mypUI/myp-mixin/xBarMixin.js`。其文档为 [xBarMixin](/doc/guide/xBarMixin.html)
-
-## 底部固定的元素
-
-我们在使用 list 组件的时候，有一种最常见的情况就是 页面的底部 有一个 与list滚动无关的foot。比如：一个个人信息页面，最底部有一个 保存按钮；在某些列表展示页面，最底下有一个 创建内容的入口（发帖等）...
-
-我们一般希望，这些元素悬浮在list之上，他固定位置不动，至少不随着 list 的滚动而滚动。list内容会出现在它的底下，然后最终list的内容拉到最底部时又不能被遮挡。
-
-这个时候，我们就需要用到其它的设置了: `hasFoot` `footBottom` `footStyle`。
-
-### hasFoot
-
-是否包含一个 悬浮的foot组件。默认是false，也就是不包含。当 `hasFoot:true` 时，您可以 设置 `footBottom` 来设定它距离 myp-list 组件底部的距离，这个 `footBottom` 不需要考虑 xBar，我们会根据您的 xBar 相关的设置自动考虑进去。
-
-foot 的内容，我们给您提供了一个名字为 foot 的插槽。
-
-```html
-<myp-list :hasFoot="true" footBottom="16px">
-  <view slot="foot">
-    <!-- 这里是您的foot内容 -->
-  </view>
-</myp-list>
-```
-
-### footBottom
-
-footBottom 就是foot与list底部的距离，默认是 0。可以是 `Number/String`。可以带 单位 `rpx/px`。不带单位默认为 `rpx`。
-
-<p class="tip">我们没有处理有 footBottom 时list内容最底部的遮挡，您可以自己加一个 具备相同高度的cell，或者使用 footToken 设置。</p>
-
-### footToken
-
-自定义给list的底部加一个具备 footToken 高度的 空cell，通常情况是为了 处理内容遮挡，比如处理 foot时的内容遮挡。通常您可以设置成 foot内容的高度 + footBottom 的值。
-
-### footStyle
-
-允许给 foot 插槽外层的 view 设置一个 个性化的style。比如： `footStyle:"left:75rpx;width:600rpx;"`
-
-## 其它事件
-
-### @scroll
+**@scroll**
 
 list 滚动时的 scroll 事件的监听。
-
-## 其它props
-
-### width
-
-list的宽度设置。
-
-### bgType
-
-list的主题背景色设置。比如: `bgType="primary"`
-
-### scrollStyle
-
-myp-list 的个性化 `scroll/list` 的 style 配置。
-
-### boxStyle
-
-myp-list 组件的 个性化style 配置。比如您可以设置 `boxStyle="position:absolute;"` 等。
-
-## slots
-
-### 默认插槽
-
-list的内容。必须由 `<myp-list-cell></myp-list-cell>` 包裹。
-
-### foot插槽
-
-foot内容，具体见上面的 [底部固定的元素](#底部固定的元素)
-
-## TODO
-
-- 页面无内容提示占位；
-- 提供整个内容页的刷新显示（比如空白页面刷新时，刷新组件占满全屏）；
-- 回到顶部；
-- 更多更灵活的页面页码管理；

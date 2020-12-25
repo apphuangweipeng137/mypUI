@@ -1,15 +1,16 @@
 ---
 title: 状态栏：myp-status
 type: guide
-order: 72
+order: 75
+page: https://mypui.asnowsoft.cn/h5/#/pages/base/height
 ---
 
 ## Props
 
 | Prop name | Description | Type   | Values | Default |
 | --------- | ----------- | ------ | ------ | ------- |
-| bgType    |             | string | -      | ''      |
-| boxStyle  |             | string | -      | ''      |
+| bgType    | 背景主题    | string | -      | ''      |
+| boxStyle  | 外层样式    | string | -      | ''      |
 
 ## Slots
 

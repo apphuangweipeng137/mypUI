@@ -4,8 +4,8 @@
 
 | Prop name | Description | Type   | Values | Default |
 | --------- | ----------- | ------ | ------ | ------- |
-| bgType    |             | string | -      | ''      |
-| boxStyle  |             | string | -      | ''      |
+| bgType    | 背景主题    | string | -      | ''      |
+| boxStyle  | 外层样式    | string | -      | ''      |
 
 ## Slots
 

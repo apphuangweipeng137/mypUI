@@ -1,14 +1,14 @@
 <template>
 	<view>
 		<myp-navbar title="抽屉/拖动" :lefts="leftIcons" @leftAction="navLeftAction"></myp-navbar>
-		<myp-list-simple>
+		<myp-list :down="null" :up="null">
 			<myp-list-cell>
 				<view style="height: 20rpx;"></view>
 			</myp-list-cell>
 			<myp-list-cell v-for="(item,idx) in items" :key="idx">
 				<myp-cell :title="item.title" :value="item.desc" valueStyle="text-align:right;" border="bottom" indicator="right" indicatorType="third" boxStyle="padding-left:32rpx;padding-right:32rpx;" @cellClicked="toPop(item)"></myp-cell>
 			</myp-list-cell>
-		</myp-list-simple>
+		</myp-list>
 		<stand-bottom ref="standBottom"></stand-bottom>
 		<pop-bottom ref="popBottom"></pop-bottom>
 		<myp-toast ref="myp-toast"></myp-toast>
@@ -37,7 +37,9 @@
 				{title: '抽屉', desc: '左侧出现', type: 'drawerLeft', page: 'drawer_left'}, 
 				{title: '抽屉', desc: '右侧出现', type: 'drawerRight', page: 'drawer_right'}, 
 				{title: '当作popup', desc: '底部出现', type: 'popBottom'}, 
-				{title: '支持standout', desc: '底部出现', type: 'standBottom'}]
+				{title: '支持standout', desc: '底部出现', type: 'standBottom'},
+				{title: '双层scroll', desc: '无遮罩，双层滚动', type: 'scrollDrawer', page: 'scroll_drawer'}
+				]
 			}
 		},
 		methods: {

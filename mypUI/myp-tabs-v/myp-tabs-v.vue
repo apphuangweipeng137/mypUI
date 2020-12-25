@@ -1,10 +1,17 @@
 <template>
 	<scroll-view ref="scroll" id="scroll" :scroll-y="true" :scroll-top="scrollTop" :scroll-with-animation="true" :show-scrollbar="false" :class="['myp-bg-'+bgType, 'myp-tabs-scroll']" :style="mrScrollStyle">
 		<view class="myp-tabs" :style="mrTabsStyle">
-			<view v-for="(item, index) in items" :key="index" :ref="'item'+index" :id="'item'+index" class="myp-tab-item" :style="mrItemStyle + (index===value ? activeItemStyle:'')" @click="changeTab(index)">
+			<view v-if="hasIndicator&&!hoverTop" :class="['myp-tab-item-indicator', 'myp-bg-'+(indicatorType&&indicatorType.length>0?indicatorType:'text')]" :style="mrIndStyle">
+				<slot name="indicator"></slot>
+			</view>
+			<view :style="{height: top}"></view>
+			<view v-for="(item, index) in items" :key="index" :ref="'item'+index" :id="'item'+index" class="myp-flex-row myp-align-center" :style="mrItemStyle + (index===value ? activeItemStyle:'')" @click="changeTab(index)">
 				<text :class="['myp-color-'+(index===value?activeTextType:textType), 'myp-size-'+(index===value?activeTextSize:textSize)]" :style="textStyle + (index===value ? activeTextStyle : '')">{{ textLabel ? item[textLabel] : item }}</text>
 			</view>
-			<view v-if="hasIndicator" :class="['myp-tab-item-indicator', 'myp-bg-'+(indicatorType&&indicatorType.length>0?indicatorType:'text')]" :style="mrIndStyle"></view>
+			<view :style="{height: bottom}"></view>
+			<view v-if="hasIndicator&&hoverTop" :class="['myp-tab-item-indicator', 'myp-bg-'+(indicatorType&&indicatorType.length>0?indicatorType:'text')]" :style="mrIndStyle">
+				<slot name="indicator"></slot>
+			</view>
 		</view>
 	</scroll-view>
 </template>
@@ -20,109 +27,226 @@
 	
 	export default {
 		props: {
+			/**
+			 * tabs内容
+			 */
 			items: {
 				type: Array,
 				default: function() {
 					return []
 				}
 			},
-			// current index
+			/**
+			 * 当前index
+			 */
 			value: {
 				type: Number,
 				default: 0
 			},
+			/**
+			 * 文字内容的字段
+			 */
 			textLabel: {
 				type: String,
 				default: null
 			},
-			// height of scroll
+			/**
+			 * scroll的自定义高度
+			 */
 			scrollSize: {
 				type: String,
 				default: '750rpx'
 			},
-			// center或者end的时候，请注意items的数量不要超过总尺寸
+			/**
+			 * center或者end的时候，请注意items的数量不要超过总尺寸
+			 */
 			justify: {
 				type: String,
 				default: 'flex-start'
 			},
+			/**
+			 * 文字尺寸主题
+			 */
 			textSize: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前项文字尺寸主题
+			 */
 			activeTextSize: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 背景主题
+			 */
 			bgType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 文字颜色主题
+			 */
 			textType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前项文字颜色主题
+			 */
 			activeTextType: {
 				type: String,
 				default: ''
 			},
-			// item height: rpx/px
-			// 0的时候，自适应高度
+			/**
+			 * tab项的自定义高度。0的时候，自适应高度
+			 */
 			height: {
 				type: String,
 				default: '80rpx'
 			},
+			/**
+			 * tab项的自定义宽度
+			 */
 			width: {
 				type: String,
 				default: '120rpx'
 			},
+			/**
+			 * 顶部空白占位
+			 */
+			top: {
+				type: String,
+				default: '0'
+			},
+			/**
+			 * 底部空白占位
+			 */
+			bottom: {
+				type: String,
+				default: '0'
+			},
+			/**
+			 * 是否有指示器
+			 */
 			hasIndicator: {
 				type: Boolean,
 				default: true
 			},
+			/**
+			 * 指示器背景主题
+			 */
 			indicatorType: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 指示器自定义宽度
+			 */
 			indicatorWidth: {
 				type: String,
 				default: '4rpx'
 			},
-			// 0的时候动态高度，自适应高度
+			/**
+			 * 指示器自定义高度。0的时候动态高度，自适应高度
+			 */
 			indicatorHeight: {
 				type: String,
 				default: '40rpx'
 			},
+			/**
+			 * 指示器自定义圆角
+			 */
 			indicatorRadius: {
 				type: String,
 				default: '4rpx'
 			},
+			/**
+			 * 指示器与左侧的距离
+			 */
 			indicatorLeft: {
 				type: String,
 				default: '6rpx'
 			},
+			/**
+			 * 外层样式。也是scroll的样式
+			 */
 			boxStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 文字样式
+			 */
 			textStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前项的文字样式
+			 */
 			activeTextStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * tab项的样式
+			 */
 			itemStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 当前tab项的样式
+			 */
 			activeItemStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 指示器的样式
+			 */
 			indicatorStyle: {
 				type: String,
 				default: ''
+			},
+			/**
+			 * 通过改变该值触发位置的重新计算。
+			 * 主要是为了兼容各大平台位置获取的时机问题。
+			 * 在弹层里面，items能够很快拿到，
+			 * 但是不一定位置信息就可以立马拿到
+			 */
+			updateTime: {
+				type: Number,
+				default: 0
+			},
+			/**
+			 * 延迟获取元素内容，
+			 * 只影响mounted里面的调用，
+			 * -1表示不延迟。
+			 * 其他情况使用updateTime
+			 */
+			delay: {
+				type: Number,
+				default: -1
+			},
+			/**
+			 * 延迟获取元素内容，
+			 * 只影响items改变时的调用，
+			 * -1表示不延迟。
+			 * 其他情况使用updateTime
+			 */
+			updateDelay: {
+				type: Number,
+				default: -1
+			},
+			/**
+			 * indicator是否在最上层
+			 */
+			hoverTop: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -195,24 +319,41 @@
 			}
 		},
 		mounted() {
-			setTimeout(()=>{
+			if (this.delay >= 0) {
+				const that = this
+				setTimeout(()=>{
+					that.toCurrentIndex(that.value)
+					that.toCacheItemsSize()
+				}, this.delay)
+			} else {
 				this.toCurrentIndex(this.value)
 				this.toCacheItemsSize()
-			}, 60)
+			}
 		},
 		watch: {
 			value(newV) {
-				setTimeout(()=>{
-					this.toCurrentIndex(newV)
-				}, 0)
+				this.toCurrentIndex(newV)
 			},
 			items() {
 				// 清缓存
 				this.dyItems = {}
-				setTimeout(()=>{
-					this.toCurrentIndex(this.value)
-					this.toCacheItemsSize()
-				}, 60)
+				const that = this
+				this.$nextTick(function(){
+					if (that.updateDelay >= 0) {
+						setTimeout(()=>{
+							that.toCacheItemsSize()
+							that.toCurrentIndex(that.value)
+						}, that.updateDelay)
+					} else {
+						that.toCacheItemsSize()
+						that.toCurrentIndex(that.value)
+					}
+				})
+			},
+			updateTime() {
+				this.dyItems = {}
+				this.toCacheItemsSize()
+				this.toCurrentIndex(this.value)
 			}
 		},
 		methods: {
@@ -290,20 +431,13 @@
 			async toCacheItemsSize() {
 				let scrollT = 0
 				try{
-					const cachedS = this.dyItems['scroll']
-					if (cachedS) {
-						scrollT = cachedS.top
-					} else {
-						const res = await this.getElSize(-100)
-						scrollT = res.top
-						this.dyItems['scroll'] = {top: scrollT}
-					}
+					const res = await this.getElSize(-100)
+					scrollT = res.top
+					this.dyItems['scroll'] = {top: scrollT}
 				}catch(e){
 					//TODO handle the exception
 				}
 				for (const i in this.items) {
-					const cached = this.dyItems['item'+i]
-					if (cached) continue;
 					try{
 						const result = await this.getElSize(i)
 						let indHeight = result.height
@@ -373,11 +507,7 @@
 	.myp-tabs {
 		position: relative;
 	}
-	
 	.myp-tab-item {
-		flex-direction: row;
-		align-items: center;
-		
 		&-indicator {
 			position: absolute;
 			bottom: 0;

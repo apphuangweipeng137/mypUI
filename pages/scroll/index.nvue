@@ -1,14 +1,14 @@
 <template>
 	<view>
 		<myp-navbar :lefts="leftIcons" title="各种scroll的适配" @leftAction="navLeftAction"></myp-navbar>
-		<myp-list-simple bgType="page">
+		<myp-list :down="null" :up="null" bgType="page">
 			<myp-list-cell>
 				<view style="height: 20rpx;"></view>
 			</myp-list-cell>
 			<myp-list-cell v-for="(item,idx) in items" :key="idx">
 				<myp-cell :icon="item.icon" :title="item.name" :value="item.desc" indicator="right" radius="none" border="bottom" height="ll" valueStyle="text-align:right;" boxStyle="padding-left:30rpx;padding-right:30rpx;" @cellClicked="toDetailScroll(item)"></myp-cell>
 			</myp-list-cell>
-		</myp-list-simple>
+		</myp-list>
 		<myp-loading ref="myp-loading"></myp-loading>
 	</view>
 </template>
@@ -30,7 +30,9 @@
 					{name: 'list', page: 'scroll_list_simple', icon: 'topic', desc: '简单list'},
 					{name: 'list', page: 'scroll_list_loading', icon: 'topic', desc: 'list，带下拉/上提'},
 					{name: 'list', page: 'scroll_list_more', icon: 'topic', desc: 'list，带下拉/loadmoreoffset'},
-					{name: 'waterfall', page: 'scroll_waterfall', icon: 'radio-button', desc: 'waterfall，带下拉/上提'}
+					{name: 'list', page: 'video_api', icon: 'topic', desc: '视频接口测试'},
+					{name: 'waterfall', page: 'scroll_waterfall', icon: 'radio-button', desc: 'waterfall，带下拉/上提'},
+					{name: '位置', page: 'scroll_to_position', icon: 'radio-button', desc: '滚动到指定位置'}
 				]
 			}
 		},

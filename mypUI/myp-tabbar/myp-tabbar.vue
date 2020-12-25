@@ -1,6 +1,6 @@
 <template>
-	<view class="myp-tab-page" :style="{top: topPx+'px'}">
-		<view class="myp-tab-page-container" ref="tab-container" :style="mrTabContainerStyle+noWeexTransform">
+	<view class="myp-tab-page myp-flex-column" :style="{top: topPx+'px'}">
+		<view class="myp-tab-page-container myp-flex-row" ref="tab-container" :style="mrTabContainerStyle+noWeexTransform">
 			<slot></slot>
 		</view>
 		<view v-if="isSeize">
@@ -15,10 +15,10 @@
 			</view>
 		</slot>
 		<slot name="tabs">
-			<view class="myp-tabs" :style="tabStyle.boxStyle||''">
-				<view class="myp-tabs-items" :style="tabStyle.tabsStyle||''">
-					<view bubble="true" class="myp-tabs-item" v-for="(item, idx) in tabs" :key="idx" :ref="'myp-tab-'+idx" :style="mrItemStyle" @tap="setPage(idx)">
-						<view v-if="!item.isHump" class="myp-tabs-item-icon" :style="'width:'+(item.iconBoxWidth||mrIconWidth)+';'">
+			<view class="myp-tabs myp-flex-column" :style="tabStyle.boxStyle||''">
+				<view class="myp-tabs-items myp-flex-row" :style="tabStyle.tabsStyle||''">
+					<view bubble="true" class="myp-tabs-item myp-flex-column myp-flex-one myp-align-center myp-justify-between" v-for="(item, idx) in tabs" :key="idx" :ref="'myp-tab-'+idx" :style="mrItemStyle" @tap="setPage(idx)">
+						<view v-if="!item.isHump" class="myp-tabs-item-icon myp-flex-row myp-justify-center myp-align-center" :style="'width:'+(item.iconBoxWidth||mrIconWidth)+';'">
 							<image :src="currentPage===idx?item.selectedIcon:item.icon" :style="currentPage===idx?((tabStyle.selectedIconStyle||'')+(item.selectedIconStyle||'')):((tabStyle.iconStyle||'')+(item.iconStyle||''))"></image>
 							<view v-if="item.badge" class="myp-tabs-item-badge" :style="(tabStyle.badgeStyle||'')+(item.badgeStyle||'')">
 								<text class="myp-tabs-item-badge-text" :style="(tabStyle.badgeTextStyle||'')+(item.badgeTextStyle||'')">{{item.badge}}</text>
@@ -31,8 +31,8 @@
 				<myp-xbar v-if="considerXBar&&!tabStyle.imageWidthXBar" :bgType="xBarBgType" :boxStyle="xBarStyle"></myp-xbar>
 			</view>
 			<!-- hump -->
-			<view bubble="true" v-if="hasHump" class="myp-tabs-hump" :style="mrHumpStyle||''" @tap="setPage(humpIndex)">
-				<view class="myp-tabs-item-icon" :style="'width:'+(humpItem.iconBoxWidth||mrIconWidth)+';'">
+			<view bubble="true" v-if="hasHump" class="myp-tabs-hump myp-flex-column myp-align-center myp-justify-center" :style="mrHumpStyle||''" @tap="setPage(humpIndex)">
+				<view class="myp-tabs-item-icon myp-flex-row myp-justify-center myp-align-center" :style="'width:'+(humpItem.iconBoxWidth||mrIconWidth)+';'">
 					<image :src="currentPage===humpIndex?humpItem.selectedIcon:humpItem.icon" :style="currentPage===humpIndex?((tabStyle.selectedIconStyle||'')+(humpItem.selectedIconStyle||'')):((tabStyle.iconStyle||'')+(humpItem.iconStyle||''))"></image>
 					<view v-if="humpItem.badge" class="myp-tabs-item-badge" :style="(tabStyle.badgeStyle||'')+(humpItem.badgeStyle||'')">
 						<text class="myp-tabs-item-badge-text" :style="(tabStyle.badgeTextStyle||'')+(humpItem.badgeTextStyle||'')">{{humpItem.badge}}</text>
@@ -54,15 +54,24 @@
 	
 	export default {
 		props: {
-			// 可以为每一个tab单独设置
-			// isHump 表示是否凸起, noPage 表示点击当前tab时不切换，依然停留在原tab内容, hump具备humpStyle,hump有humpBottom(就是距离底部的距离px)
-			// icon,selectedIcon,title,selectedTitle,badge,dot,isHump,noPage,humpStyle,humpBottom
-			// iconStyle,selectedIconStyle,titleStyle,selectedTitleStyle,badgeStyle,badgeTextStyle,dotStyle,iconBoxWidth
+			/**
+			 * tabs的内容以及个性化的配置。
+			 * isHump表示是否凸起,
+			 * noPage表示点击当前tab时不切换，依然停留在原tab内容。
+			 * hump具备humpStyle,hump有humpBottom(就是距离底部的距离px)。
+			 * icon,selectedIcon,title,selectedTitle,
+			 * badge,dot,
+			 * isHump,noPage,humpStyle,humpBottom
+			 * iconStyle,selectedIconStyle,titleStyle,selectedTitleStyle,
+			 * badgeStyle,badgeTextStyle,dotStyle,iconBoxWidth
+			 */
 			tabs: {
 				type: Array,
 				default: () => ([])
 			},
-			// global tabs set
+			/**
+			 * 全局tabs的样式设置。tabs中可以单独设置进行覆盖
+			 */
 			tabStyle: {
 				type: Object,
 				default: ()=>{
@@ -87,30 +96,51 @@
 					}
 				}
 			},
+			/**
+			 * 页面切换的动画周期
+			 */
 			duration: {
 				type: Number,
 				default: 300
 			},
+			/**
+			 * 页面切换的动画函数
+			 */
 			timingFunction: {
 				type: String,
 				default: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
 			},
+			/**
+			 * 距离顶部的距离
+			 */
 			top: {
 				type: String,
 				default: '0'
 			},
+			/**
+			 * tabs以及xbar的高度是否有占位
+			 */
 			isSeize: {
 				type: Boolean,
 				default: true
 			},
+			/**
+			 * 是否考虑xbar
+			 */
 			considerXBar: {
 				type: Boolean,
 				default: true
 			},
+			/**
+			 * xbar的背景主题
+			 */
 			xBarBgType: {
 				type: String,
 				default: 'inverse'
 			},
+			/**
+			 * xbar的样式
+			 */
 			xBarStyle: {
 				type: String,
 				default: ''
@@ -252,25 +282,19 @@
 
 <style lang="scss" scoped>
 	.myp-tab-page {
-		position: absolute;
+		// position: absolute;
+		// 我们使用fixed，
+		// 因为absolute时，在mp端高度受外层影响.
+		// 外层高度不设置时是0，会导致在MP-IOS端isSeize下的内容排在最顶部，从而产生遮挡问题
+		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		flex-direction: column;
-		/* #ifndef APP-NVUE */
-		display: flex;
-		box-sizing: border-box;
-		/* #endif */
 		
 		&-container {
 			width: 750rpx;
 			flex: 1;
-			/* #ifndef APP-NVUE */
-			display: flex;
-			box-sizing: border-box;
-			/* #endif */
-			flex-direction: row;
 			position: relative;
 		}
 	}
@@ -279,11 +303,6 @@
 		left: 0;
 		bottom: 0;
 		width: 750rpx;
-		/* #ifndef APP-NVUE */
-		display: flex;
-		box-sizing: border-box;
-		/* #endif */
-		flex-direction: column;
 		
 		&-img {
 			position: fixed;
@@ -293,11 +312,6 @@
 		}
 		&-items {
 			width: 750rpx;
-			/* #ifndef APP-NVUE */
-			display: flex;
-			box-sizing: border-box;
-			/* #endif */
-			flex-direction: row;
 			background-color: #FFFFFF;
 		}
 		&-hump {
@@ -305,33 +319,12 @@
 			left: 375rpx;
 			bottom: 0;
 			transform: translateX(-50%);
-			/* #ifndef APP-NVUE */
-			display: flex;
-			box-sizing: border-box;
-			/* #endif */
-			justify-content: center;
-			align-items: center;
 		}
 		&-item {
-			/* #ifndef APP-NVUE */
-			display: flex;
-			box-sizing: border-box;
-			/* #endif */
-			flex-direction: column;
-			justify-content: space-between;
-			align-items: center;
-			flex: 1;
 			padding: 5px;
 			
 			&-icon {
 				position: relative;
-				/* #ifndef APP-NVUE */
-				display: flex;
-				box-sizing: border-box;
-				/* #endif */
-				flex-direction: row;
-				justify-content: center;
-				align-items: center;
 			}
 			&-text {
 				font-size: 13px;

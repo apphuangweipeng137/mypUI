@@ -1,5 +1,5 @@
 <template>
-	<view :class="['myp-cp', 'myp-bg-'+bgType]" :style="mrBoxStyle">
+	<view :class="['myp-cp', 'myp-flex-column', 'myp-align-center', 'myp-justify-center', 'myp-bg-'+bgType]" :style="mrBoxStyle">
 		<slot></slot>
 		<view class="myp-cp-right" :style="{width: (evenWidth/2)+'px', height: evenWidth+'px'}">
 			<view ref="myp-right" class="myp-cp-right-rotate" :style="mrRightStyle+noWeexRightAni+noWeexRightOpacity"></view>
@@ -12,54 +12,86 @@
 </template>
 
 <script>
-	import weexMixin from './weexMixin.js'
-	import noWeexMixin from './noWeexMixin.js'
+	// #ifdef APP-NVUE
+	const animation = uni.requireNativePlugin('animation');
+	// #endif
 	import {getPx} from '../utils/system.js'
 	
 	export default {
-		mixins: [weexMixin, noWeexMixin],
 		props: {
+			/**
+			 * 进度。0-100
+			 */
 			progress: {
 				type: Number,
 				default: 0
 			},
+			/**
+			 * 自定义宽度
+			 */
 			width: {
 				type: String,
 				default: '80px'
 			},
+			/**
+			 * 自定义边框宽度
+			 */
 			borderWidth: {
 				type: String,
 				default: '6px'
 			},
+			/**
+			 * 自定义边框颜色
+			 */
 			borderColor: {
 				type: String,
 				default: '#8F9CFF'
 			},
+			/**
+			 * 背景主题
+			 */
 			bgType: {
 				type: String,
 				default: 'inverse'
 			},
+			/**
+			 * 外层样式
+			 */
 			boxStyle: {
 				type: String,
 				default: ''
 			},
+			/**
+			 * 是否每次从0开始
+			 */
 			fromZero: {
 				type: Boolean,
 				default: false
 			},
+			/**
+			 * 是否动画回到0
+			 */
 			aniToZero: {
 				type: Boolean,
 				default: true
 			},
+			/**
+			 * 0-100的整体动画周期
+			 */
 			duration: {
 				type: Number,
 				default: 2000
 			},
+			/**
+			 * 动画函数
+			 */
 			timingFunction: {
 				type: String,
 				default: 'ease-out'
 			},
-			// 仅仅只是app-nvue
+			/**
+			 * 是否同时动画
+			 */
 			twoWay: {
 				type: Boolean,
 				default: false
@@ -179,7 +211,545 @@
 						right: duration * pr
 					}
 				}
+			},
+			// #ifndef APP-NVUE
+			twoWayZeroProgress(pr, lastPr, duration) {
+				let delay = 0
+				if (this.aniToZero) {
+					const lastDur = this.getBackDuration(lastPr, this.duration)
+					delay = lastDur.left > lastDur.right ? lastDur.left : lastDur.right
+				}
+				const that = this
+				this.noWeexRightAni = `transition-duration: ${delay}ms; transform: rotate(45deg);`
+				this.noWeexLeftAni = `transition-duration: ${delay}ms; transform: rotate(225deg);`
+				setTimeout(()=>{
+					if (pr > 0.5) {
+						that.noWeexLeftOpacity = 'opacity: 1;'
+						that.noWeexRightOpacity = 'opacity:1;'
+					} else {
+						that.noWeexLeftOpacity = 'opacity:0;'
+						if (pr <= 0) {
+							that.noWeexRightOpacity = 'opacity:0;'
+						} else {
+							that.noWeexRightOpacity = 'opacity:1;'
+						}
+					}
+					const newDur = that.getDuration(pr, duration)
+					const dur = newDur.left > newDur.right ? newDur.left : newDur.right
+					const newDeg = that.getDeg(pr)
+					that.noWeexRightAni = `transition-duration: ${dur}ms; transform: rotate(${newDeg.right}deg);`
+					that.noWeexLeftAni = `transition-duration: ${dur}ms; transform: rotate(${newDeg.left}deg);`
+				}, delay)
+			},
+			twoWayProgress(pr, lastPr, duration) {
+				// continue
+				let dur = duration
+				const newDeg = this.getDeg(pr)
+				if (!duration) {
+					const newDur = this.getDuration(pr, duration)
+					const lastDur = this.getBackDuration(lastPr, this.duration)
+					dur = Math.max(Math.abs(newDur.left - lastDur.left), Math.abs(newDur.right - lastDur.right))
+				}
+				if (lastPr > 0.5) {
+					
+				} else {
+					if (pr > 0.5) {
+						this.noWeexLeftOpacity = 'opacity:1;'
+					}
+					if (pr > 0) {
+						this.noWeexRightOpacity = 'opacity:1;'
+					}
+				}
+				this.noWeexRightAni = `transition-duration: ${dur}ms; transform: rotate(${newDeg.right}deg);`
+				this.noWeexLeftAni = `transition-duration: ${dur}ms; transform: rotate(${newDeg.left}deg);`
+				const that = this
+				setTimeout(()=>{
+					if (pr <= 0.5) {
+						this.noWeexLeftOpacity = 'opacity:0;'
+					}
+					if (pr <= 0) {
+						this.noWeexRightOpacity = 'opacity:0;'
+					}
+				}, dur)
+			},
+			oneWayZeroProgress(pr, lastPr, duration) {
+				const that = this
+				// back to zero
+				let leftDelay = 0
+				let rightDelay = 0
+				if (this.aniToZero) {
+					const lastDur = this.getBackDuration(lastPr, this.duration)
+					leftDelay = lastDur.left
+					rightDelay = lastDur.right
+				}
+				const newDur = this.getDuration(pr, duration)
+				const newDeg = this.getDeg(pr)
+				
+				this.noWeexLeftAni = `transition-duration: ${leftDelay}ms; transform: rotate(225deg);`
+				
+				setTimeout(()=>{
+					that.noWeexLeftOpacity = 'opacity:0;'
+					that.noWeexRightAni = `transition-duration: ${rightDelay}ms; transform: rotate(45deg);`
+				}, leftDelay)
+				
+				setTimeout(()=>{
+					if (pr <= 0) {
+						that.noWeexRightOpacity = 'opacity:0;'
+					} else {
+						that.noWeexRightOpacity = 'opacity:1;'
+					}
+					that.noWeexRightAni = `transition-duration: ${newDur.right}ms; transform: rotate(${newDeg.right}deg);`
+				}, leftDelay+rightDelay)
+				
+				setTimeout(()=>{
+					if (pr > 0.5) {
+						that.noWeexLeftOpacity = 'opacity:1;'
+					} else {
+						that.noWeexLeftOpacity = 'opacity:0;'
+					}
+					that.noWeexLeftAni = `transition-duration: ${newDur.left}ms; transform: rotate(${newDeg.left}deg);`
+				}, leftDelay+rightDelay+newDur.right)
+			},
+			oneWayProgress(pr, lastPr, duration) {
+				const that = this
+				const newDur = this.getDuration(pr, duration)
+				const newDeg = this.getDeg(pr)
+				if (pr > 0) {
+					this.noWeexRightOpacity = 'opacity:1;'
+				}
+				if (duration) {
+					if (pr >= lastPr) {
+						this.noWeexRightAni = `transition-duration: ${newDur.right}ms; transform: rotate(${newDeg.right}deg);`
+						setTimeout(()=>{
+							if (pr <= 0) {
+								that.noWeexRightOpacity = 'opacity:0;'
+							}
+							if (pr > 0.5 && lastPr <= 0.5) {
+								that.noWeexLeftOpacity = 'opacity:1;'
+							}
+							that.noWeexLeftAni = `transition-duration: ${newDur.left}ms; transform: rotate(${newDeg.left}deg);`
+						}, newDur.right)
+					} else {
+						this.noWeexLeftAni = `transition-duration: ${newDur.left}ms; transform: rotate(${newDeg.left}deg);`
+						setTimeout(()=>{
+							if (pr < 0.5) {
+								that.noWeexLeftOpacity = 'opacity:0;'
+							}
+							that.noWeexRightAni = `transition-duration: ${newDur.right}ms; transform: rotate(${newDeg.right}deg);`
+						}, newDur.left)
+						setTimeout(()=>{
+							if (pr <= 0) {
+								that.noWeexRightOpacity = 'opacity:0;'
+							}
+						}, newDur.left + newDur.right)
+					}
+				} else {
+					const lastDur = this.getBackDuration(lastPr, this.duration)
+					if (pr >= lastPr) {
+						this.noWeexRightAni = `transition-duration: ${newDur.right - lastDur.right}ms; transform: rotate(${newDeg.right}deg);`
+						setTimeout(()=>{
+							if (pr <= 0) {
+								that.noWeexRightOpacity = 'opacity:0;'
+							}
+							if (pr > 0.5 && lastPr <= 0.5) {
+								that.noWeexLeftOpacity = 'opacity:1;'
+							}
+							that.noWeexLeftAni = `transition-duration: ${newDur.left - lastDur.left}ms; transform: rotate(${newDeg.left}deg);`
+						}, newDur.right - lastDur.right)
+					} else {
+						this.noWeexLeftAni = `transition-duration: ${lastDur.left - newDur.left}ms; transform: rotate(${newDeg.left}deg);`
+						setTimeout(()=>{
+							if (pr < 0.5) {
+								that.noWeexLeftOpacity = 'opacity:0;'
+							}
+							that.noWeexRightAni = `transition-duration: ${lastDur.right - newDur.right}ms; transform: rotate(${newDeg.right}deg);`
+						}, lastDur.left - newDur.left)
+						setTimeout(()=>{
+							if (pr <= 0) {
+								that.noWeexRightOpacity = 'opacity:0;'
+							}
+						}, lastDur.left - newDur.left + lastDur.right - newDur.right)
+					}
+				}
+			},
+			// #endif
+			// #ifdef APP-NVUE
+			initOpacityState() {
+				const rightEl = this.$refs['myp-right']
+				const leftEl = this.$refs['myp-left']
+				animation.transition(rightEl, {
+					styles: {
+						opacity: 0
+					}
+				})
+				animation.transition(leftEl, {
+					styles: {
+						opacity: 0
+					}
+				})
+			},
+			twoWayZeroProgress(pr, lastPr, duration) {
+				const rightEl = this.$refs['myp-right']
+				const leftEl = this.$refs['myp-left']
+				
+				let delay = 0
+				if (this.aniToZero) {
+					const lastDur = this.getBackDuration(lastPr, this.duration)
+					delay = lastDur.left > lastDur.right ? lastDur.left : lastDur.right
+				}
+				// back to zero
+				animation.transition(leftEl, {
+					styles: {
+						transform: 'rotate(225deg)'
+					},
+					duration: delay,
+					delay: 0
+				})
+				animation.transition(rightEl, {
+					styles: {
+						transform: 'rotate(45deg)'
+					},
+					duration: delay,
+					delay: 0
+				}, ()=>{
+					if (pr > 0.5) {
+						animation.transition(leftEl, {
+							styles: {
+								opacity: 1,
+								transform: 'rotate(225deg)'
+							}
+						})
+						animation.transition(rightEl, {
+							styles: {
+								opacity: 1,
+								transform: 'rotate(45deg)'
+							}
+						})
+					} else {
+						animation.transition(leftEl, {
+							styles: {
+								opacity: 0,
+								transform: 'rotate(225deg)'
+							}
+						})
+						if (pr <= 0) {
+							animation.transition(rightEl, {
+								styles: {
+									opacity: 0,
+									transform: 'rotate(45deg)'
+								}
+							})
+						} else {
+							animation.transition(rightEl, {
+								styles: {
+									opacity: 1,
+									transform: 'rotate(45deg)'
+								}
+							})
+						}
+					}
+					// forward
+					const newDur = this.getDuration(pr, duration)
+					const dur = newDur.left > newDur.right ? newDur.left : newDur.right
+					const newDeg = this.getDeg(pr)
+					animation.transition(leftEl, {
+						styles: {
+							transform: `rotate(${newDeg.left}deg)`
+						},
+						duration: dur
+					})
+					animation.transition(rightEl, {
+						styles: {
+							transform: `rotate(${newDeg.right}deg)`
+						},
+						duration: dur
+					})
+				})
+			},
+			twoWayProgress(pr, lastPr, duration) {
+				const rightEl = this.$refs['myp-right']
+				const leftEl = this.$refs['myp-left']
+				// continue
+				let dur = duration
+				const newDeg = this.getDeg(pr)
+				if (!duration) {
+					const newDur = this.getDuration(pr, duration)
+					const lastDur = this.getBackDuration(lastPr, this.duration)
+					dur = Math.max(Math.abs(newDur.left - lastDur.left), Math.abs(newDur.right - lastDur.right))
+				}
+				if (lastPr > 0.5) {
+					
+				} else {
+					if (pr > 0.5) {
+						animation.transition(leftEl, {
+							styles: {
+								opacity: 1,
+								transform: 'rotate(225deg)'
+							}
+						})
+					}
+					if (lastPr <=0 && pr > 0) {
+						animation.transition(rightEl, {
+							styles: {
+								opacity: 1,
+								transform: 'rotate(45deg)'
+							}
+						})
+					}
+				}
+				animation.transition(leftEl, {
+					styles: {
+						transform: `rotate(${newDeg.left}deg)`
+					},
+					duration: dur
+				})
+				animation.transition(rightEl, {
+					styles: {
+						transform: `rotate(${newDeg.right}deg)`
+					},
+					duration: dur
+				}, ()=>{
+					if (pr <= 0.5) {
+						animation.transition(leftEl, {
+							styles: {
+								opacity: 0,
+								transform: 'rotate(225deg)'
+							}
+						})
+					}
+					if (pr <= 0) {
+						animation.transition(rightEl, {
+							styles: {
+								opacity: 0,
+								transform: 'rotate(45deg)'
+							}
+						})
+					}
+				})
+			},
+			oneWayZeroProgress(pr, lastPr, duration) {
+				const rightEl = this.$refs['myp-right']
+				const leftEl = this.$refs['myp-left']
+				const that = this
+				// back to zero
+				let leftDelay = 0
+				let rightDelay = 0
+				if (this.aniToZero) {
+					const lastDur = this.getBackDuration(lastPr, this.duration)
+					leftDelay = lastDur.left
+					rightDelay = lastDur.right
+				}
+				animation.transition(leftEl, {
+					styles: {
+						transform: 'rotate(225deg)'
+					},
+					duration: leftDelay
+				}, ()=>{
+					animation.transition(leftEl, {
+						styles: {
+							opacity: 0,
+							transform: 'rotate(225deg)'
+						}
+					})
+					animation.transition(rightEl, {
+						styles: {
+							transform: 'rotate(45deg)'
+						},
+						duration: rightDelay
+					}, ()=>{
+						if (pr <= 0) {
+							animation.transition(rightEl, {
+								styles: {
+									opacity: 0,
+									transform: 'rotate(45deg)'
+								}
+							})
+						} else {
+							animation.transition(rightEl, {
+								styles: {
+									opacity: 1,
+									transform: 'rotate(45deg)'
+								}
+							})
+						}
+						// forward
+						const newDur = that.getDuration(pr, duration)
+						const newDeg = that.getDeg(pr)
+						animation.transition(rightEl, {
+							styles: {
+								transform: `rotate(${newDeg.right}deg)`
+							},
+							duration: newDur.right
+						}, ()=>{
+							if (pr > 0.5) {
+								animation.transition(leftEl, {
+									styles: {
+										opacity: 1,
+										transform: 'rotate(225deg)'
+									}
+								})
+							} else {
+								animation.transition(leftEl, {
+									styles: {
+										opacity: 0,
+										transform: 'rotate(225deg)'
+									}
+								})
+							}
+							animation.transition(leftEl, {
+								styles: {
+									transform: `rotate(${newDeg.left}deg)`
+								},
+								duration: newDur.left
+							})
+						})
+					})
+				})
+			},
+			oneWayProgress(pr, lastPr, duration) {
+				const rightEl = this.$refs['myp-right']
+				const leftEl = this.$refs['myp-left']
+				const that = this
+				const newDur = this.getDuration(pr, duration)
+				const newDeg = this.getDeg(pr)
+				if (lastPr <=0 && pr > 0) {
+					animation.transition(rightEl, {
+						styles: {
+							opacity: 1,
+							transform: 'rotate(45deg)'
+						}
+					})
+				}
+				if (duration) {
+					if (pr >= lastPr) {
+						animation.transition(rightEl, {
+							styles: {
+								transform: `rotate(${newDeg.right}deg)`
+							},
+							duration: newDur.right
+						}, ()=>{
+							if (pr <= 0) {
+								animation.transition(rightEl, {
+									styles: {
+										opacity: 0,
+										transform: 'rotate(45deg)'
+									}
+								})
+							}
+							if (pr > 0.5 && lastPr <= 0.5) {
+								animation.transition(leftEl, {
+									styles: {
+										opacity: 1,
+										transform: 'rotate(225deg)'
+									}
+								})
+							}
+							animation.transition(leftEl, {
+								styles: {
+									transform: `rotate(${newDeg.left}deg)`
+								},
+								duration: newDur.left
+							})
+						})
+					} else {
+						animation.transition(leftEl, {
+							styles: {
+								transform: `rotate(${newDeg.left}deg)`
+							},
+							duration: newDur.left
+						}, ()=>{
+							if (pr < 0.5) {
+								animation.transition(leftEl, {
+									styles: {
+										opacity: 0,
+										transform: 'rotate(225deg)'
+									}
+								})
+							}
+							animation.transition(rightEl, {
+								styles: {
+									transform: `rotate(${newDeg.right}deg)`
+								},
+								duration: newDur.right
+							}, ()=>{
+								if (pr <= 0) {
+									animation.transition(rightEl, {
+										styles: {
+											opacity: 0,
+											transform: 'rotate(45deg)'
+										}
+									})
+								}
+							})
+						})
+					}
+				} else {
+					const lastDur = this.getBackDuration(lastPr, this.duration)
+					if (pr >= lastPr) {
+						animation.transition(rightEl, {
+							styles: {
+								transform: `rotate(${newDeg.right}deg)`
+							},
+							duration: newDur.right - lastDur.right
+						}, ()=>{
+							if (pr <= 0) {
+								animation.transition(rightEl, {
+									styles: {
+										opacity: 0,
+										transform: 'rotate(45deg)'
+									}
+								})
+							}
+							if (pr > 0.5 && lastPr <= 0.5) {
+								animation.transition(leftEl, {
+									styles: {
+										opacity: 1,
+										transform: 'rotate(225deg)'
+									}
+								})
+							}
+							animation.transition(leftEl, {
+								styles: {
+									transform: `rotate(${newDeg.left}deg)`
+								},
+								duration: newDur.left - lastDur.left
+							})
+						})
+					} else {
+						animation.transition(leftEl, {
+							styles: {
+								transform: `rotate(${newDeg.left}deg)`
+							},
+							duration: lastDur.left - newDur.left
+						}, ()=>{
+							if (pr < 0.5) {
+								animation.transition(leftEl, {
+									styles: {
+										opacity: 0,
+										transform: 'rotate(225deg)'
+									}
+								})
+							}
+							animation.transition(rightEl, {
+								styles: {
+									transform: `rotate(${newDeg.right}deg)`
+								},
+								duration: lastDur.right - newDur.right
+							}, ()=>{
+								if (pr <= 0) {
+									animation.transition(rightEl, {
+										styles: {
+											opacity: 0,
+											transform: 'rotate(45deg)'
+										}
+									})
+								}
+							})
+						})
+					}
+				}
 			}
+			// #endif
 		},
 		created() {
 			const w = getPx(this.width)
@@ -208,23 +778,8 @@
 <style lang="scss" scoped>
 	.myp-cp {
 		position: relative;
-		/* #ifndef APP-NVUE */
-		display: flex;
-		box-sizing: border-box;
-		/* #endif */
-		justify-content: center;
-		align-items: center;
 		overflow: hidden;
 		
-		&-in {
-			position: absolute;
-			/* #ifndef APP-NVUE */
-			display: flex;
-			box-sizing: border-box;
-			/* #endif */
-			justify-content: center;
-			align-items: center;
-		}
 		&-right {
 			position: absolute;
 			overflow: hidden;
